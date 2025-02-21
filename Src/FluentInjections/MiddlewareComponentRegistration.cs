@@ -3,7 +3,7 @@
 
 namespace FluentInjections;
 
-internal class MiddlewareComponentRegistration<TContract>
+internal class MiddlewareRegistration<TContract>
     : ComponentRegistration<IMiddlewareComponent, TContract>
     , IComponentRegistration<IMiddlewareComponent, TContract>
 { }

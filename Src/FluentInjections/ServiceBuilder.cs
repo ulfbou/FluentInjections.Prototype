@@ -7,12 +7,12 @@ using System.Diagnostics.Contracts;
 
 namespace FluentInjections;
 
-internal class ServiceComponentBuilder<TContract, TRegistration>
+internal class ServiceBuilder<TContract, TRegistration>
     : ComponentBuilderBase<IServiceComponent, TContract, TRegistration>
     , IServiceBuilder, IComponentBuilder<IServiceComponent, TContract>
         where TRegistration : IComponentRegistration<IServiceComponent, TContract>
 {
-    public ServiceComponentBuilder(TRegistration registration, ILoggerFactory loggerFactory)
+    public ServiceBuilder(TRegistration registration, ILoggerFactory loggerFactory)
         : base(registration, loggerFactory)
     { }
 }

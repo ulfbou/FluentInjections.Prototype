@@ -48,8 +48,16 @@ internal class InternalServiceInjectionModule<TBuilder>
                         sp.GetRequiredService<ILogger<ConcurrentEventHandlerRegistry>>(),
                         TimeSpan.FromSeconds(30)));
         configurator.Register<IApplication<WebApplicationBuilder>>(nameof(WebApplication))
-                    .UsingFactory(sp => new WebApplication(
-                        sp.GetRequiredService<WebApplicationBuilder>()));
+                    .UsingFactory(sp =>
+                    {
+                        WebApplicationBuilder builder = sp.GetRequiredService<WebApplicationBuilder>();
+                        var innerBuilder = builder.GetInnerBuilder<Microsoft.AspNetCore.Builder.WebApplicationBuilder>();
+                        var innerApplication = innerBuilder.Build();
+                        return new WebApplication(
+                             builder,
+                             innerApplication);
+                    });
+
         configurator.Register<ModuleManagerHandler>(nameof(ModuleManagerHandler))
                     .UsingFactory(sp => new ModuleManagerHandler(
                         sp.GetRequiredService<IModuleManager>()));

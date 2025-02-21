@@ -5,7 +5,7 @@ using FluentInjections.Validation;
 
 namespace FluentInjections;
 
-internal class ServiceComponentRegistration<TContract>
+internal class ServiceRegistration<TContract>
     : ComponentRegistration<IServiceComponent, TContract>
     , IComponentRegistration<IServiceComponent, TContract>
 { }

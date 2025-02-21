@@ -51,7 +51,7 @@ internal class MiddlewareConfigurator<TBuilder> : ComponentConfiguratorBase<IMid
 
     protected override IComponentRegistration<IMiddlewareComponent, object> CreateRegistration(Type componentType, string alias)
     {
-        return new MiddlewareComponentRegistration<object>
+        return new MiddlewareRegistration<object>
         {
             ContractType = componentType,
             Alias = alias
@@ -60,7 +60,7 @@ internal class MiddlewareConfigurator<TBuilder> : ComponentConfiguratorBase<IMid
 
     protected override IComponentRegistration<IMiddlewareComponent, TContract> CreateRegistration<TContract>(string alias)
     {
-        return new MiddlewareComponentRegistration<TContract>
+        return new MiddlewareRegistration<TContract>
         {
             ContractType = typeof(TContract),
             Alias = alias

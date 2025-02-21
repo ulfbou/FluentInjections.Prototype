@@ -6,6 +6,7 @@ using FluentInjections.Validation;
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 
@@ -16,7 +17,7 @@ using System.Reflection;
 namespace FluentInjections;
 
 public abstract class InjectionBuilderBase<TBuilder> : IInjectionBuilder<TBuilder>
-    where TBuilder : class, IApplicationBuilder<TBuilder>
+    where TBuilder : class, IApplicationBuilder<TBuilder>, IHostApplicationBuilder
 {
     protected readonly IServiceProvider _internalServiceProvider;
     protected readonly TBuilder? _builder;

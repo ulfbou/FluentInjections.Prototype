@@ -6,23 +6,34 @@ using FluentInjections.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
-namespace FluentInjections
+namespace FluentInjections;
+
+internal class LifecycleConfigurator : ComponentConfiguratorBase<ILifecycleComponent>, ILifecycleConfigurator
 {
-    internal class LifecycleConfigurator : ComponentConfiguratorBase<ILifecycleComponent>, ILifecycleConfigurator
+    public LifecycleConfigurator(IComponentRegistry<ILifecycleComponent> registry, ILoggerFactory loggerFactory)
+        : base(registry, loggerFactory)
+    { }
+
+    protected override IComponentBuilder<ILifecycleComponent, TContract> CreateBuilder<TContract>(IComponentRegistration<ILifecycleComponent, TContract> registration)
     {
-        public LifecycleConfigurator(IComponentRegistry<ILifecycleComponent> registry, ILoggerFactory loggerFactory)
-            : base(registry, loggerFactory)
-        { }
+        return new LifecycleBuilder<TContract, IComponentRegistration<ILifecycleComponent, TContract>>(registration, _loggerFactory);
+    }
 
-        public override Task RegisterAsync(CancellationToken? cancellationToken = null)
+    protected override IComponentRegistration<ILifecycleComponent, object> CreateRegistration(Type componentType, string alias)
+    {
+        return new LifecycleRegistration<object>
         {
-            throw new NotImplementedException();
-        }
+            ContractType = componentType,
+            Alias = alias
+        };
+    }
 
-        public Task<IComponentBuilder<ILifecycleComponent, TContract>> RegisterAsync<TContract>(string? alias = null) => throw new NotImplementedException();
-        public Task<IComponentBuilder<ILifecycleComponent, object>> RegisterAsync(Type contractType, string? alias = null) => throw new NotImplementedException();
-        protected override IComponentBuilder<ILifecycleComponent, TContract> CreateBuilder<TContract>(IComponentRegistration<ILifecycleComponent, TContract> registration) => throw new NotImplementedException();
-        protected override IComponentRegistration<ILifecycleComponent, object> CreateRegistration(Type componentType, string alias) => throw new NotImplementedException();
-        protected override IComponentRegistration<ILifecycleComponent, TContract> CreateRegistration<TContract>(string alias) => throw new NotImplementedException();
+    protected override IComponentRegistration<ILifecycleComponent, TContract> CreateRegistration<TContract>(string alias)
+    {
+        return new LifecycleRegistration<TContract>
+        {
+            ContractType = typeof(TContract),
+            Alias = alias
+        };
     }
 }

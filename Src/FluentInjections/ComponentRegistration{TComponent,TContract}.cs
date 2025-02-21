@@ -6,7 +6,7 @@ using FluentInjections.Validation;
 
 namespace FluentInjections;
 
-public class ComponentRegistration<TComponent, TContract>
+internal class ComponentRegistration<TComponent, TContract>
     : ComponentRegistration<TComponent>
     , IComponentRegistration<TComponent, TContract> where TComponent : IComponent
 {

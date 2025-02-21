@@ -15,4 +15,5 @@ public interface IApplicationBuilder<TBuilder> : IDisposable
     IServiceCollection Services { get; }
     TBuilder Builder { get; }
     Task<IApplication<TBuilder>> BuildAsync(CancellationToken? cancellationToken = default);
+    TInnerBuilder GetInnerBuilder<TInnerBuilder>();
 }

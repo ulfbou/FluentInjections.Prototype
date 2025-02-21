@@ -3,7 +3,7 @@
 
 namespace FluentInjections;
 
-public abstract class ComponentRegistration<TComponent> : IComponentRegistration<TComponent> where TComponent : IComponent
+internal abstract class ComponentRegistration<TComponent> : IComponentRegistration<TComponent> where TComponent : IComponent
 {
     protected IComponentDescriptor<TComponent>? _descriptor;
 

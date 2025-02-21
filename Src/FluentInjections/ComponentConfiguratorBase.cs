@@ -4,6 +4,7 @@
 using FluentInjections.DependencyInjection;
 using FluentInjections.Validation;
 using FluentInjections;
+
 using Microsoft.Extensions.Logging;
 
 internal abstract class ComponentConfiguratorBase<TComponent> : IConfigurator<TComponent>

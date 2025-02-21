@@ -3,7 +3,7 @@
 
 namespace FluentInjections;
 
-internal class LifecycleComponentRegistration<TContract>
+internal class LifecycleRegistration<TContract>
     : ComponentRegistration<ILifecycleComponent, TContract>
     , IComponentRegistration<ILifecycleComponent, TContract>
 { }
