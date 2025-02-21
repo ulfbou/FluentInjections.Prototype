@@ -24,6 +24,8 @@ internal sealed class WebApplicationBuilderInjectionBuilderFactory : InjectionBu
         var innerBuilder = Microsoft.AspNetCore.Builder.WebApplication.CreateBuilder(_arguments);
         var builder = new WebApplicationBuilder(innerBuilder);
         var factory = sp.GetRequiredService<IServiceProviderFactory>();
-        return new WebApplicationBuilderInjectionBuilder(_composer.ServiceProvider, builder, factory);
+        var environment = innerBuilder.Environment;
+        var configuration = innerBuilder.Configuration;
+        return new WebApplicationBuilderInjectionBuilder(_composer.ServiceProvider, builder, factory, environment, configuration);
     }
 }
