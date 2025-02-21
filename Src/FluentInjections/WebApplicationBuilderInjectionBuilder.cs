@@ -1,8 +1,4 @@
-﻿// Copyright (c) FluentInjections Project. All rights reserved.
-// Licensed under the MIT License. See LICENSE in the project root for license information.
-
-
-using FluentInjections.Collections;
+﻿using FluentInjections.Collections;
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting; // For IWebHostEnvironment
@@ -65,11 +61,10 @@ internal class WebApplicationBuilderInjectionBuilder : InjectionBuilderBase<WebA
 
         // Configure the inner builder with the service provider.
         _builder.Services.Add(_services); // Add internal services
-        _builder.Host.ConfigureServices(_ => { }); // Dummy call to force service provider creation.
 
         // Configure host and web host if needed.
-        ConfigureHost(_builder.InnerBuilder.Host);
-        ConfigureWebHost(_builder.InnerBuilder.WebHost);
+        ConfigureHost(_builder.GetInnerBuilder<Microsoft.Extensions.Hosting.IHostBuilder>());
+        ConfigureWebHost(_builder.GetInnerBuilder<Microsoft.AspNetCore.Hosting.IWebHostBuilder>());
 
         _logger.LogDebug("Applying middleware configurations...");
 
@@ -84,8 +79,7 @@ internal class WebApplicationBuilderInjectionBuilder : InjectionBuilderBase<WebA
         _logger.LogDebug("Executing application builder...");
 
         // Execute the application builder.
-        await _applicationBuilderExecutor.ExecuteAsync(_builder, _serviceProvider, cancellationToken);
-
+        await _applicationBuilderExecutor.ExecuteBuildAsync(_builder, cancellationToken);
 
         _logger.LogInformation("WebApplication built successfully.");
 
@@ -118,10 +112,11 @@ internal class WebApplicationBuilderInjectionBuilder : InjectionBuilderBase<WebA
         });
     }
 
-
-    protected override IApplication<WebApplicationBuilder> CreateApplication(WebApplicationBuilder builder)
+    protected IApplication<WebApplicationBuilder> CreateApplication(WebApplicationBuilder builder)
     {
-        return new WebApplication(builder);
+        var innerBuilder = builder.GetInnerBuilder<Microsoft.AspNetCore.Builder.WebApplicationBuilder>();
+        var innerApplication = innerBuilder.Build();
+        return new WebApplication(builder, innerApplication);
     }
 
     protected override async Task RegisterExternalModulesAsync(CancellationToken cancellationToken)
