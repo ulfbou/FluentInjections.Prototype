@@ -1,0 +1,51 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<OutputType>Library</OutputType>
+		<TargetFramework>net9.0</TargetFramework>
+		<LangVersion>13.0</LangVersion>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<PackageId>FluentInjections</PackageId>
+		<AssemblyTitle>FluentInjections</AssemblyTitle>
+		<AssemblyProduct>FluentInjections</AssemblyProduct>
+		<Version>0.1-beta</Version>
+		<Authors>Ulf Bourelius</Authors>
+		<Description>
+			FluentInjections is a streamlined dependency injection library for .NET that simplifies and enhances the
+			use of dependency injection containers, focusing on lifetime management and integration with AutoFac.
+			It provides an elegant API for registering and resolving services while maintaining modularity and scalability.
+		</Description>
+		<PackageTags>dependency injection; AutoFac; .NET; lifetime management; Fluent API; DI; modularity</PackageTags>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<PackageProjectUrl>https://github.com/ulfbou/FluentInjections/wiki</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/ulfbou/FluentInjections</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+		<LangVersion>latest</LangVersion>
+		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Update="**/*.link">
+			<Visible>false</Visible>
+		</None>
+		<None Include="README.md" Pack="true" PackagePath="" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<FrameworkReference Include="Microsoft.AspNetCore.App" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.3.0" />
+		<PackageReference Include="Microsoft.Extensions.Configuration" Version="9.*" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.*" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.*" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.*" />
+		<PackageReference Include="Moq" Version="4.*" />
+		<PackageReference Include="Nito.AsyncEx" Version="5.1.2" />
+		<PackageReference Include="System.Collections.Concurrent" Version="4.*" />
+	</ItemGroup>
+
+</Project>
