@@ -10,7 +10,7 @@ using System.Reflection;
 
 namespace FluentInjections.Collections;
 
-public class AssemblyCollection : IEnumerable<Assembly>
+public class AssemblyCollection : IEnumerable<Assembly>, IDisposable
 {
     private readonly ILogger<AssemblyCollection> _logger;
 
@@ -53,4 +53,9 @@ public class AssemblyCollection : IEnumerable<Assembly>
 
     public IEnumerator<Assembly> GetEnumerator() => ((IEnumerable<Assembly>)Assemblies).GetEnumerator();
     IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)Assemblies).GetEnumerator();
+    public void Dispose()
+    {
+        _logger.LogDebug("Disposed {Count} assemblies", Assemblies.Count);
+        Assemblies.Clear();
+    }
 }

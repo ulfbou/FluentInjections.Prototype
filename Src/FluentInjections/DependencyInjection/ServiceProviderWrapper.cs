@@ -1,126 +1,65 @@
 ﻿// Copyright (c) FluentInjections Project. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
-using FluentInjections.Events;
-using FluentInjections.Validation;
-
 using Microsoft.Extensions.DependencyInjection;
 
 namespace FluentInjections.DependencyInjection;
 
-public class ServiceProviderWrapper : IServiceProviderWrapper, IServiceProvider
+public class ServiceProviderWrapper : IServiceProviderWrapper
 {
-    private readonly IServiceProvider _innerProvider;
-    private readonly Events.IConcurrentEventBus _eventBus;
+    private readonly IServiceProvider _serviceProvider;
 
-    public Guid ScopeId { get; private set; }
+    public Guid ScopeId { get; } = Guid.NewGuid();
 
-    public ServiceProviderWrapper(IServiceProvider innerProvider, Events.IConcurrentEventBus eventBus)
+    public ServiceProviderWrapper(IServiceProvider serviceProvider)
     {
-        _innerProvider = innerProvider;
-        _eventBus = eventBus;
-
-        if (innerProvider is IServiceProviderWrapper wrapper)
-        {
-            ScopeId = wrapper.ScopeId;
-        }
-        else
-        {
-            ScopeId = Guid.NewGuid();
-        }
-    }
-
-    public object? GetService(Type serviceType) => _innerProvider.GetService(serviceType);
-    public T? GetService<T>() => _innerProvider.GetService<T>();
-
-    public IScopeWrapper CreateScope()
-    {
-        var innerScope = _innerProvider.CreateScope();
-        var scopeWrapper = new InnerScopeWrapper(innerScope, _eventBus);
-
-        _eventBus.PublishAsync(new ScopeCreatedEvent(ScopeId, scopeWrapper.Id), TimeSpan.FromSeconds(30), CancellationToken.None).GetAwaiter().GetResult();
-        return scopeWrapper;
+        _serviceProvider = serviceProvider;
     }
 
     public async Task<IScopeWrapper> CreateScopeAsync(CancellationToken cancellationToken)
     {
-        var innerScope = _innerProvider.CreateScope();
-        var scopeWrapper = new InnerScopeWrapper(innerScope, _eventBus);
-        return await _eventBus.PublishAsync(new ScopeCreatedEvent(ScopeId, scopeWrapper.Id), TimeSpan.FromSeconds(30), CancellationToken.None)
-                              .ContinueWith(_ => scopeWrapper, cancellationToken);
+        var scope = _serviceProvider.CreateScope();
+        return await Task.FromResult(new InnerScopeWrapper(scope.ServiceProvider));
     }
-    public Task<object?> GetService(Type serviceType, CancellationToken cancellationToken)
+
+    public async Task<object?> GetService(Type serviceType, CancellationToken cancellationToken)
     {
-        Guard.NotNull(serviceType, nameof(serviceType));
-        Guard.NotNull(cancellationToken, nameof(cancellationToken));
-        return Task.FromResult(_innerProvider.GetService(serviceType));
+        return await Task.FromResult(_serviceProvider.GetService(serviceType));
     }
-    public Task<T?> GetService<T>(CancellationToken cancellationToken)
+
+    public async Task<T?> GetService<T>(CancellationToken cancellationToken)
     {
-        Guard.NotNull(cancellationToken, nameof(cancellationToken));
-        return Task.FromResult(_innerProvider.GetService<T>());
+        try
+        {
+            return await Task.FromResult((T?)_serviceProvider.GetService(typeof(T)));
+        }
+        catch
+        {
+            return default;
+        }
     }
 
     private class InnerScopeWrapper : IScopeWrapper
     {
-        private readonly IServiceScope _innerScope;
-        private readonly Events.IConcurrentEventBus _eventBus;
-        private readonly object _disposeLock = new object();
-        private bool _disposed;
+        public Guid Id { get; } = Guid.NewGuid();
+        public IServiceProvider ServiceProvider { get; }
 
-        public InnerScopeWrapper(IServiceScope innerScope, Events.IConcurrentEventBus eventBus)
+        public InnerScopeWrapper(IServiceProvider serviceProvider)
         {
-            _innerScope = innerScope;
-            _eventBus = eventBus;
-            ServiceProvider = new ServiceProviderWrapper(_innerScope.ServiceProvider, eventBus);
-            Id = Guid.NewGuid();
+            ServiceProvider = serviceProvider;
         }
 
-        public IServiceProvider ServiceProvider { get; }
-        public Guid Id { get; }
+        public ValueTask DisposeAsync()
+        {
+            Dispose();
+            return ValueTask.CompletedTask;
+        }
 
         public void Dispose()
         {
-            lock (_disposeLock)
+            if (ServiceProvider is IDisposable disposable)
             {
-                if (!_disposed)
-                {
-                    _innerScope.Dispose();
-                    _eventBus.PublishAsync(new ScopeDisposedEvent(Id), TimeSpan.FromSeconds(30), CancellationToken.None).GetAwaiter().GetResult();
-                    _disposed = true;
-                }
-            }
-        }
-
-        public async ValueTask DisposeAsync()
-        {
-            bool shouldDispose;
-
-            lock (_disposeLock)
-            {
-                if (_disposed)
-                {
-                    shouldDispose = false;
-                }
-                else
-                {
-                    shouldDispose = true;
-                    _disposed = true;
-                }
-            }
-
-            if (shouldDispose)
-            {
-                if (_innerScope is IAsyncDisposable asyncDisposable)
-                {
-                    await asyncDisposable.DisposeAsync();
-                }
-                else
-                {
-                    _innerScope.Dispose();
-                }
-
-                await _eventBus.PublishAsync(new ScopeDisposedEvent(Id), TimeSpan.FromSeconds(30), CancellationToken.None);
+                disposable.Dispose();
             }
         }
     }

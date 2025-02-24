@@ -1,6 +1,7 @@
 ﻿// Copyright (c) FluentInjections Project. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
+using FluentInjections.Components;
 using FluentInjections.DependencyInjection;
 using FluentInjections.Validation;
 
@@ -19,11 +20,13 @@ public record ComponentDescriptor<TComponent, TContract> : IComponentDescriptor<
     public object Parameters { get; init; }
     public Func<IServiceProvider, bool>? Condition { get; init; }
     public TContract? Instance { get; init; }
-    public Func<IServiceProvider, TContract>? Factory { get; init; }
+    public Func<IServiceProvider, CancellationToken?, ValueTask<TContract>>? Factory { get; init; }
     public Action<TContract>? Configure { get; init; }
     public Func<IServiceProvider, TContract>? Decorator { get; init; }
 
     public IDictionary<string, object?> Dependencies { get; init; }
+
+    Func<IServiceProvider, CancellationToken?, ValueTask<TContract>>? IComponentDescriptor<TComponent, TContract>.Factory => throw new NotImplementedException();
 
     public ComponentDescriptor(
         string Alias,
@@ -33,7 +36,7 @@ public record ComponentDescriptor<TComponent, TContract> : IComponentDescriptor<
         object? Parameters = null,
         Func<bool>? Condition = null,
         TContract? Instance = default,
-        Func<IServiceProvider, TContract>? Factory = null,
+        Func<IServiceProvider, CancellationToken?, ValueTask<TContract>>? Factory = null,
         Action<TContract>? Configure = null,
         Func<IServiceProvider, TContract>? Decorator = null)
     {
@@ -60,7 +63,7 @@ public record ComponentDescriptor<TComponent, TContract> : IComponentDescriptor<
         this.Alias = registration.Alias;
         this.Lifetime = registration.Lifetime;
         this.ContractType = registration.ContractType;
-        this.Parameters = registration.Parameters ?? new object[] { };
+        this.Parameters = registration.Parameters ?? new Dictionary<string, object?>();
         this.Metadata = registration.Metadata.AsReadOnly();
         this.Condition = registration.Condition;
 
