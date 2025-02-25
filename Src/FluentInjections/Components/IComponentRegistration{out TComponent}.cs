@@ -5,7 +5,7 @@ namespace FluentInjections.Components
 {
     public interface IComponentRegistration<out TComponent>
     {
-        Type ContractType { get; set; }
-        string Alias { get; set; }
+        Type ContractType { get; }
+        string Alias { get; }
     }
 }

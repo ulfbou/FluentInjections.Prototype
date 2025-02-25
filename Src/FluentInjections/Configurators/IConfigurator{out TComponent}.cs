@@ -6,10 +6,10 @@ using FluentInjections.Components;
 
 namespace FluentInjections.Configurators
 {
-    public interface IConfigurator<out TComponent> : IConfigurator
+    public interface IConfigurator<TComponent> : IConfigurator
         where TComponent : IComponent
     {
-        IComponentBuilder<TComponent, TContract> Register<TContract>(string alias);
-        IComponentBuilder<TComponent, object> Register(Type contractType, string alias);
+        ValueTask<IComponentBuilder<TComponent, TContract>> RegisterAsync<TContract>(string? alias = null);
+        ValueTask<IComponentBuilder<TComponent, object>> RegisterAsync(Type contractType, string? alias = null);
     }
 }

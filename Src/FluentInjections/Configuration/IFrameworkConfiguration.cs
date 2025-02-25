@@ -5,5 +5,6 @@ namespace FluentInjections.Configuration
 {
     public interface IFrameworkConfiguration
     {
+        int AsyncTimeoutMilliseconds { get; }
     }
 }

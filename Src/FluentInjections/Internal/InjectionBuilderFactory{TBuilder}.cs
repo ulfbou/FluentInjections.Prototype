@@ -7,7 +7,7 @@ using FluentInjections.Validation;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
-namespace FluentInjections.Injection
+namespace FluentInjections.Internal
 {
     public class InjectionBuilderFactory<TBuilder>
         : IInjectionBuilderFactory<TBuilder>
@@ -26,7 +26,7 @@ namespace FluentInjections.Injection
         public IInjectionBuilder<TBuilder> CreateBuilder()
         {
             var loggerFactory = _services.BuildServiceProvider().GetRequiredService<ILoggerFactory>();
-            return new InjectionBuilder<TBuilder>(_services, loggerFactory, _arguments);
+            return (IInjectionBuilder<TBuilder>)Activator.CreateInstance(typeof(InjectionBuilder<>).MakeGenericType(typeof(TBuilder)), loggerFactory, _arguments)!;
         }
     }
 }

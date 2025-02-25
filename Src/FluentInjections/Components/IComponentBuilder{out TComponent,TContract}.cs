@@ -3,7 +3,7 @@
 
 namespace FluentInjections.Components
 {
-    public interface IComponentBuilder<out TComponent, TContract> : IDisposable
+    public interface IComponentBuilder<out TComponent, TContract> : IAsyncDisposable
         where TComponent : IComponent
     {
         IComponentBuilder<TComponent, TContract> To<TImplementation>() where TImplementation : class, TContract;

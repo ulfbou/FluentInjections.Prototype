@@ -2,6 +2,7 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
 using FluentInjections.Components;
+using FluentInjections.DependencyInjection;
 using FluentInjections.Validation;
 
 using Microsoft.Extensions.DependencyInjection;
@@ -11,26 +12,17 @@ namespace FluentInjections.Configurators
     public abstract class ConfiguratorBase<TComponent> : ConfiguratorBase, IConfigurator<TComponent>
         where TComponent : IComponent
     {
+        protected readonly IComponentResolver<TComponent> _internalResolver;
         protected readonly IServiceCollection _services;
 
-        protected ConfiguratorBase(IServiceCollection services)
+        protected ConfiguratorBase(IComponentResolver<TComponent> internalResolver, IServiceCollection? services = null)
         {
-            Guard.NotNull(services, nameof(services));
-            _services = services;
+            Guard.NotNull(internalResolver, nameof(internalResolver));
+            _internalResolver = internalResolver;
+            _services = services ?? new ServiceCollection();
         }
 
-        public virtual IComponentBuilder<TComponent, TContract> Register<TContract>(string alias)
-        {
-            Guard.NotNull(alias, nameof(alias));
-            return new FluentComponentBuilder<TComponent, TContract>(_services, alias);
-        }
-
-        public virtual IComponentBuilder<TComponent, object> Register(Type contractType, string alias)
-        {
-            Guard.NotNull(contractType, nameof(contractType));
-            Guard.NotNull(alias, nameof(alias));
-            return new FluentComponentBuilder<TComponent, object>(_services, alias);
-        }
+        public abstract ValueTask<IComponentBuilder<TComponent, TContract>> RegisterAsync<TContract>(string alias);
+        public abstract ValueTask<IComponentBuilder<TComponent, object>> RegisterAsync(Type contractType, string alias);
     }
 }
-

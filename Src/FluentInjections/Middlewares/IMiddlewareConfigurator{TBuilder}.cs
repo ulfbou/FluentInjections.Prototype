@@ -11,12 +11,6 @@ namespace FluentInjections.Middlewares
     public interface IMiddlewareConfigurator<TBuilder> : IConfigurator<IMiddlewareComponent>
         where TBuilder : IApplicationBuilder<TBuilder>
     {
-        IMiddlewareConfigurator<TBuilder> Use<TMiddleware>(string? alias, params object[]? arguments)
-            where TMiddleware : class;
-
-        IMiddlewareBuilder<TBuilder, TMiddleware> UseMiddleware<TMiddleware>(string? alias, params object[]? arguments)
-            where TMiddleware : class, IMiddleware;
-
         IApplication<TBuilder> Application { get; }
     }
 }

@@ -2,8 +2,10 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
 using FluentInjections.Components;
+using FluentInjections.DependencyInjection;
 using FluentInjections.Validation;
 
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace FluentInjections.Builders;
@@ -12,32 +14,38 @@ internal abstract class ComponentBuilderBase<TComponent, TContract, TRegistratio
     where TComponent : IComponent
     where TRegistration : IComponentRegistration<TComponent, TContract>
 {
-    protected readonly TRegistration _registration;
     protected readonly ILogger _logger;
-    protected readonly IDisposable? _scope;
+    protected readonly IComponentResolver<TComponent> _innerResolver;
+    protected readonly IServiceCollection _services;
+    private readonly ILoggerFactory _loggerFactory;
+    protected readonly IDisposable _scope;
     protected bool disposed;
 
-    public ComponentBuilderBase(TRegistration registration, ILoggerFactory loggerFactory)
-    {
-        Guard.NotNull(registration, nameof(registration));
-        Guard.NotNull(loggerFactory, nameof(loggerFactory));
+    public abstract TRegistration Registration { get; }
 
-        _registration = registration;
+    protected ComponentBuilderBase(IComponentResolver<TComponent> innerResolver, IServiceCollection services, ILoggerFactory loggerFactory)
+    {
+        Guard.NotNull(innerResolver, nameof(innerResolver));
+        Guard.NotNull(services, nameof(services));
+        Guard.NotNull(loggerFactory, nameof(loggerFactory));
+        _innerResolver = innerResolver;
+        _services = services;
+        _loggerFactory = loggerFactory;
         _logger = loggerFactory.CreateLogger(GetType());
-        _scope = _logger.BeginScope("ComponentBuilder<{Component}, {Contract}>", typeof(TComponent).Name, typeof(TContract).Name);
+        _scope = _logger.BeginScope("ComponentBuilder<{Component}, {Contract}>", typeof(TComponent).Name, typeof(TContract).Name)!;
     }
 
     public IComponentBuilder<TComponent, TContract> To<TImplementation>() where TImplementation : class, TContract
     {
         _logger.LogInformation("Setting component implementation to {Implementation}.", typeof(TImplementation).Name);
-        _registration.ResolutionType = typeof(TImplementation);
+        Registration.ResolutionType = typeof(TImplementation);
         return this;
     }
 
     public IComponentBuilder<TComponent, TContract> ToSelf()
     {
         _logger.LogInformation("Setting component implementation to self.");
-        _registration.ResolutionType = typeof(TContract);
+        Registration.ResolutionType = typeof(TContract);
         return this;
     }
 
@@ -45,7 +53,7 @@ internal abstract class ComponentBuilderBase<TComponent, TContract, TRegistratio
     {
         Guard.NotNull(instance, nameof(instance));
         _logger.LogInformation("Setting component instance.");
-        _registration.Instance = instance;
+        Registration.Instance = instance;
         return this;
     }
 
@@ -53,7 +61,7 @@ internal abstract class ComponentBuilderBase<TComponent, TContract, TRegistratio
     {
         Guard.NotNull(factory, nameof(factory));
         _logger.LogInformation("Setting component factory.");
-        _registration.Factory = factory;
+        Registration.Factory = factory;
         return this;
     }
 
@@ -61,35 +69,35 @@ internal abstract class ComponentBuilderBase<TComponent, TContract, TRegistratio
     {
         Guard.NotNull(condition, nameof(condition));
         _logger.LogInformation("Setting component condition.");
-        _registration.Condition = condition;
+        Registration.Condition = condition;
         return this;
     }
 
     public IComponentBuilder<TComponent, TContract> AsSingleton()
     {
         _logger.LogInformation("Setting component lifetime to singleton.");
-        _registration.Lifetime = ComponentLifetime.Singleton;
+        Registration.Lifetime = ComponentLifetime.Singleton;
         return this;
     }
 
     public IComponentBuilder<TComponent, TContract> AsScoped()
     {
         _logger.LogInformation("Setting component lifetime to scoped.");
-        _registration.Lifetime = ComponentLifetime.Scoped;
+        Registration.Lifetime = ComponentLifetime.Scoped;
         return this;
     }
 
     public IComponentBuilder<TComponent, TContract> AsTransient()
     {
         _logger.LogInformation("Setting component lifetime to transient.");
-        _registration.Lifetime = ComponentLifetime.Transient;
+        Registration.Lifetime = ComponentLifetime.Transient;
         return this;
     }
 
     public IComponentBuilder<TComponent, TContract> WithLifetime(ComponentLifetime lifetime)
     {
         _logger.LogInformation("Setting component lifetime to {Lifetime}.", lifetime);
-        _registration.Lifetime = lifetime;
+        Registration.Lifetime = lifetime;
         return this;
     }
 
@@ -97,7 +105,7 @@ internal abstract class ComponentBuilderBase<TComponent, TContract, TRegistratio
     {
         Guard.NotNull(configure, nameof(configure));
         _logger.LogInformation("Setting component configure delegate.");
-        _registration.Configure = configure;
+        Registration.Configure = configure;
         return this;
     }
 
@@ -105,7 +113,7 @@ internal abstract class ComponentBuilderBase<TComponent, TContract, TRegistratio
     {
         Guard.NotNullOrWhiteSpace(key, nameof(key));
         _logger.LogInformation("Setting component metadata.");
-        _registration.Metadata[key] = value;
+        Registration.Metadata[key] = value;
         return this;
     }
 
@@ -113,18 +121,27 @@ internal abstract class ComponentBuilderBase<TComponent, TContract, TRegistratio
     {
         Guard.NotNull(parameters, nameof(parameters));
         _logger.LogInformation("Setting component parameters.");
-        _registration.Parameters = parameters;
+
+        foreach (var (key, value) in parameters)
+        {
+            Registration.Parameters[key] = value;
+        }
+
         return this;
     }
 
-    public void Dispose()
+    public async ValueTask DisposeAsync()
     {
-        if (disposed)
+        if (!disposed)
         {
-            return;
-        }
+            _scope?.Dispose();
+            var registry = await _innerResolver.ResolveSingleAsync<IComponentRegistry<IMiddlewareComponent>>(alias: null).ConfigureAwait(false);
 
-        _scope?.Dispose();
+            if (registry is not null && Registration is IComponentRegistration<IMiddlewareComponent, TContract> middlewareRegistration)
+            {
+                await registry.RegisterAsync(middlewareRegistration, CancellationToken.None).ConfigureAwait(false);
+            }
+        }
         disposed = true;
     }
 }

@@ -6,7 +6,7 @@ using FluentInjections.Validation;
 
 using Microsoft.Extensions.DependencyInjection;
 
-namespace FluentInjections.Injection
+namespace FluentInjections.Internal
 {
     public interface IInternalServicesComposer<TBuilder> where TBuilder : class, IApplicationBuilder<TBuilder>
     {

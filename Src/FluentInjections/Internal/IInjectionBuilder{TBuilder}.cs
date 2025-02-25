@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging;
 
 using System.Reflection;
 
-namespace FluentInjections.Injection
+namespace FluentInjections.Internal
 {
     /// <summary>
     /// Represents the builder for configuring the injection.

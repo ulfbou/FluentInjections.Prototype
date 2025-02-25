@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace FluentInjections.Application
 {
-    public interface IApplication<TBuilder>
+    public interface IApplication<out TBuilder>
         where TBuilder : IApplicationBuilder<TBuilder>
     {
         TBuilder Builder { get; }
@@ -19,5 +19,7 @@ namespace FluentInjections.Application
         Task StopAsync(CancellationToken cancellationToken = default);
         Task StartAsync(CancellationToken cancellationToken = default);
         Task<TInnerApplication> GetInnerApplicationAsync<TInnerApplication>(CancellationToken cancellationToken = default);
+        IServiceCollection Services { get; }
+        IServiceProvider Provider { get; }
     }
 }

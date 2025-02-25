@@ -6,26 +6,26 @@ using FluentInjections.Components;
 using FluentInjections.Configurators;
 using FluentInjections.DependencyInjection;
 using FluentInjections.Internal;
-using FluentInjections.Middlewares;
 using FluentInjections.Validation;
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
-namespace FluentInjections.Lifecycle
+namespace FluentInjections.Middlewares
 {
-    public class LifecycleConfigurator<TBuilder> : ConfiguratorBase<ILifecycleComponent>, ILifecycleConfigurator
+    internal class MiddlewareConfigurator<TBuilder> : ConfiguratorBase<IMiddlewareComponent>, IMiddlewareConfigurator<TBuilder>
         where TBuilder : IApplicationBuilder<TBuilder>
     {
-        private readonly TBuilder _builder;
+        public IApplication<TBuilder> Application { get; }
 
-        public LifecycleConfigurator(IComponentResolver<ILifecycleComponent> internalResolver, TBuilder builder, IServiceCollection? services = null)
+        public MiddlewareConfigurator(IComponentResolver<IMiddlewareComponent> internalResolver, IApplication<TBuilder> application, IServiceCollection? services = null)
             : base(internalResolver, services)
         {
-            Guard.NotNull(builder, nameof(builder));
-            _builder = builder;
+            Guard.NotNull(application, nameof(application));
+            Application = application;
         }
-        public override async ValueTask<IComponentBuilder<ILifecycleComponent, TContract>> RegisterAsync<TContract>(string? alias = null)
+
+        public override async ValueTask<IComponentBuilder<IMiddlewareComponent, TContract>> RegisterAsync<TContract>(string? alias = null)
         {
             alias ??= typeof(TContract).FullName ?? typeof(TContract).Name;
 
@@ -36,10 +36,10 @@ namespace FluentInjections.Lifecycle
                 throw new InvalidOperationException($"No logger factory registered.");
             }
 
-            return new FluentLifecycleBuilder<TBuilder, TContract>(_internalResolver, _builder, loggerFactory, alias);
+            return new FluentMiddlewareBuilder<TBuilder, TContract>(_internalResolver, Application, loggerFactory, alias);
         }
 
-        public override async ValueTask<IComponentBuilder<ILifecycleComponent, object>> RegisterAsync(Type contractType, string? alias = null)
+        public override async ValueTask<IComponentBuilder<IMiddlewareComponent, object>> RegisterAsync(Type contractType, string? alias = null)
         {
             Guard.NotNull(contractType, nameof(contractType));
 
@@ -51,7 +51,7 @@ namespace FluentInjections.Lifecycle
                 throw new InvalidOperationException($"No logger factory registered.");
             }
 
-            return new FluentLifecycleBuilder<TBuilder, object>(_internalResolver, _builder, loggerFactory, alias);
+            return new FluentMiddlewareBuilder<TBuilder, object>(_internalResolver, Application, loggerFactory, alias);
         }
     }
 }

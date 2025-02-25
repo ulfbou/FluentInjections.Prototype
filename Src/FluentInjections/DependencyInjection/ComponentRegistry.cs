@@ -23,7 +23,7 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 
-public class ComponentRegistry<TComponent> : IComponentRegistry<TComponent>
+internal sealed class ComponentRegistry<TComponent> : IComponentRegistry<TComponent>
     where TComponent : IComponent
 {
     private readonly List<object> _descriptors = new List<object>();

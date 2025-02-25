@@ -2,22 +2,32 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
 using FluentInjections.Application;
+using FluentInjections.Builders;
 using FluentInjections.Components;
+using FluentInjections.Configurators;
+using FluentInjections.DependencyInjection;
 
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace FluentInjections.Middlewares
 {
-    public class FluentMiddlewareBuilder<TBuilder, TContract> : FluentComponentBuilder<IMiddlewareComponent, TContract>, IMiddlewareBuilder<TBuilder, TContract>
-       where TBuilder : IApplicationBuilder<TBuilder>
+    internal sealed class FluentMiddlewareBuilder<TBuilder, TContract>
+        : ComponentBuilderBase<IMiddlewareComponent, TContract, IMiddlewareRegistration<TContract>>
+        , IMiddlewareBuilder<TBuilder, TContract>
+        , IComponentBuilder<IMiddlewareComponent, TContract>
+        where TBuilder : IApplicationBuilder<TBuilder>
     {
-        private readonly IApplication<TBuilder> _application;
+        private readonly MiddlewareRegistration<TContract> _registration;
 
-        public FluentMiddlewareBuilder(IApplication<TBuilder> application, IServiceCollection services, string alias) : base(services, alias)
+        public IApplication<TBuilder> Application { get; }
+        public override IMiddlewareRegistration<TContract> Registration => _registration;
+
+        public FluentMiddlewareBuilder(IComponentResolver<IMiddlewareComponent> innerResolver, IApplication<TBuilder> application, ILoggerFactory loggerFactory, string alias)
+            : base(innerResolver, application.Services, loggerFactory)
         {
-            _application = application;
+            Application = application;
+            _registration = new MiddlewareRegistration<TContract> { Alias = alias };
         }
-
-        public IApplication<TBuilder> Application => _application;
     }
 }

@@ -29,6 +29,6 @@ public interface IComponentRegistry<TComponent> where TComponent : IComponent
         TRegistration descriptor,
         CancellationToken cancellationToken)
         where TRegistration : IComponentRegistration<TComponent, TContract>;
-    Task RegisterAsync<TRegistration>(TRegistration descriptor, CancellationToken cancellationToken) where TRegistration : IComponentRegistration<TComponent>;
+    Task RegisterAsync<TRegistration>(TRegistration registration, CancellationToken cancellationToken) where TRegistration : IComponentRegistration<TComponent>;
     ValueTask<bool> UnregisterAsync(string alias, CancellationToken cancellationToken = default);
 }

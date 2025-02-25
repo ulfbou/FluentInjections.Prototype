@@ -6,19 +6,19 @@ using FluentInjections.Collections;
 using FluentInjections.Configurators;
 using FluentInjections.Modules;
 
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace FluentInjections.Injection
+namespace FluentInjections.Internal
 {
     public class InjectionBuilder<TBuilder> : IInjectionBuilder<TBuilder>
             where TBuilder : IInjectionBuilder<TBuilder>
     {
         public IServiceCollection Services { get; } = new ServiceCollection();
         public TBuilder Builder => (TBuilder)(object)this;
+
         private IHostBuilder _hostBuilder;
         private bool _disposed = false;
         private string[] _arguments;
@@ -32,11 +32,11 @@ namespace FluentInjections.Injection
         private readonly ILoggerFactory _loggerFactory;
         private readonly ILogger<InjectionBuilder<TBuilder>> _logger;
 
-        public InjectionBuilder(ILoggerFactory loggerFactory, string[] arguments = null)
+        public InjectionBuilder(ILoggerFactory loggerFactory, string[]? arguments = null)
         {
             _loggerFactory = loggerFactory;
             _logger = loggerFactory.CreateLogger<InjectionBuilder<TBuilder>>();
-            _arguments = arguments;
+            _arguments = arguments ?? Array.Empty<string>();
             _hostBuilder = Host.CreateDefaultBuilder();
             var logger = _loggerFactory.CreateLogger<AssemblyCollection>();
             _servicesAssemblies = new AssemblyCollection(logger);
@@ -104,7 +104,7 @@ namespace FluentInjections.Injection
                 {
                     if (typeof(Modules.IModule).IsAssignableFrom(type))
                     {
-                        Services.AddSingleton(typeof(IModule), Activator.CreateInstance(type));
+                        Services.AddSingleton(typeof(IModule), Activator.CreateInstance(type)!);
                     }
                     else if (typeof(Configurators.IConfigurator).IsAssignableFrom(type))
                     {
@@ -132,10 +132,11 @@ namespace FluentInjections.Injection
                         services.Add(serviceDescriptor);
                     }
                 });
-
-                webBuilder.Configure(app =>
+                webBuilder.ConfigureAppConfiguration((ctx, config) =>
                 {
-                    _configureApp?.Invoke(app);
+                    config.AddEnvironmentVariables();
+                    config.AddCommandLine(_arguments);
+                    ctx.Configuration = config.Build();
                 });
             });
 
@@ -162,6 +163,14 @@ namespace FluentInjections.Injection
             if (!_disposed)
             {
                 _disposed = true;
+                (_hostBuilder as IDisposable)?.Dispose();
+                _hostBuilder = null!;
+                _servicesAssemblies.Dispose();
+                _lifecyclesAssemblies.Dispose();
+                _middlewareAssemblies.Dispose();
+                _serviceConfigurations = _ => { };
+                _lifecycleConfigurations = _ => { };
+                _middlewareConfigurations = _ => { };
             }
         }
     }

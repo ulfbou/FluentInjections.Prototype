@@ -2,13 +2,14 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
 using FluentInjections.Application;
-using FluentInjections.Components;
 
-namespace FluentInjections.Middlewares
+using Microsoft.Extensions.DependencyInjection;
+
+namespace FluentInjections.Internal
 {
-    public interface IMiddlewareBuilder<TBuilder, TContract> : IComponentBuilder<IMiddlewareComponent, TContract>
+    public interface IInjectionBuilderFactory<TBuilder>
         where TBuilder : IApplicationBuilder<TBuilder>
     {
-        IApplication<TBuilder> Application { get; }
+        IInjectionBuilder<TBuilder> CreateBuilder();
     }
 }

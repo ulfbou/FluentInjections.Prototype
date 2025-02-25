@@ -5,5 +5,5 @@ using FluentInjections.Components;
 
 namespace FluentInjections.Services
 {
-    internal class ServiceRegistration<TContract> : ComponentRegistration<IServiceComponent, TContract>, IServiceRegistration<TContract> { }
+    public interface IServiceBuilder<TContract> : IComponentBuilder<IServiceComponent, TContract> { }
 }

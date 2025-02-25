@@ -2,6 +2,7 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 namespace FluentInjections.Application
@@ -11,6 +12,8 @@ namespace FluentInjections.Application
     {
         public TBuilder Builder { get; }
         public IHost Host { get; }
+        public IServiceCollection Services => Builder.Services;
+        public IServiceProvider Provider => Host.Services;
 
         public FluentApplication(TBuilder builder, IHost host)
         {
