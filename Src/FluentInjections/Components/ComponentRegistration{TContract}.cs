@@ -3,16 +3,14 @@
 
 using FluentInjections.Components;
 
-namespace FluentInjections;
-
-internal abstract class ComponentRegistration<TComponent> : IComponentRegistration<TComponent> where TComponent : IComponent
+namespace FluentInjections.Components
 {
-    protected IComponentDescriptor<TComponent>? _descriptor;
-
-    public required Type ContractType { get; set; }
-    public required string Alias { get; set; }
-
-    public IComponentDescriptor<TComponent> ComponentDescriptor => CreateDescriptor();
-
-    protected abstract IComponentDescriptor<TComponent> CreateDescriptor();
+    internal abstract class ComponentRegistration<TComponent> : IComponentRegistration<TComponent> where TComponent : IComponent
+    {
+        protected IComponentDescriptor<TComponent>? _descriptor;
+        public required Type ContractType { get; set; }
+        public required string Alias { get; set; }
+        public IComponentDescriptor<TComponent> ComponentDescriptor => CreateDescriptor();
+        protected abstract IComponentDescriptor<TComponent> CreateDescriptor();
+    }
 }

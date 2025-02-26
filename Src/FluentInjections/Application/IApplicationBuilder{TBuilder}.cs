@@ -11,8 +11,7 @@ using System.Reflection;
 
 namespace FluentInjections.Application;
 
-public interface IApplicationBuilder<TBuilder> : IDisposable
-        where TBuilder : IApplicationBuilder<TBuilder>
+public interface IApplicationBuilder<TBuilder> : IDisposable where TBuilder : IApplicationBuilder<TBuilder>
 {
     IServiceCollection Services { get; }
     TBuilder Builder { get; }

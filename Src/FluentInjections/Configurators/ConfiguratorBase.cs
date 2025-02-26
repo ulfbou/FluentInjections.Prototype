@@ -11,4 +11,3 @@ namespace FluentInjections.Configurators
         }
     }
 }
-

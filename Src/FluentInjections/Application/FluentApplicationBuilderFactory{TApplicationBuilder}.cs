@@ -7,7 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 namespace FluentInjections.Application
 {
     public class FluentApplicationBuilderFactory<TApplicationBuilder> : IApplicationBuilderFactory<TApplicationBuilder>
-        where TApplicationBuilder : class, IApplicationBuilder<TApplicationBuilder>, new() // Corrected constraint
+        where TApplicationBuilder : class, IApplicationBuilder<TApplicationBuilder>, new()
     {
         public TApplicationBuilder CreateApplicationBuilder(string[]? arguments, IServiceCollection? externalServices)
         {

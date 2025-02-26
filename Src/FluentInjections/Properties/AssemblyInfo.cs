@@ -11,6 +11,6 @@
 [assembly: InternalsVisibleTo("FluentInjections.Validation")]
 [assembly: InternalsVisibleTo("FluentInjections.Tests")]
 [assembly: InternalsVisibleTo("FluentInjections.Tests.Infrastructure")]
-[assembly: InternalsVisibleTo("FluentInjections.Tests.Unit")]
+[assembly: InternalsVisibleTo("FluentInjections.Tests.Units")]
 [assembly: InternalsVisibleTo("FluentInjections.Tests.Integration")]
 [assembly: InternalsVisibleTo("FluentInjections.Tests.E2E")]

@@ -22,7 +22,7 @@ namespace FluentInjections.Configurators
             _services = services ?? new ServiceCollection();
         }
 
-        public abstract ValueTask<IComponentBuilder<TComponent, TContract>> RegisterAsync<TContract>(string alias);
-        public abstract ValueTask<IComponentBuilder<TComponent, object>> RegisterAsync(Type contractType, string alias);
+        public abstract ValueTask<IComponentBuilder<TComponent, TContract>> RegisterAsync<TContract>(string? alias = null);
+        public abstract ValueTask<IComponentBuilder<TComponent, object>> RegisterAsync(Type contractType, string? alias = null);
     }
 }

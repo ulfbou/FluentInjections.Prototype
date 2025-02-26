@@ -12,4 +12,3 @@ namespace FluentInjections.Configurators
         Task RegisterAsync(CancellationToken cancellationToken = default);
     }
 }
-
