@@ -2,6 +2,7 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
 using FluentInjections.Abstractions;
+using FluentInjections.Abstractions.Adapters;
 using FluentInjections.Logging;
 
 using Microsoft.AspNetCore.Builder;

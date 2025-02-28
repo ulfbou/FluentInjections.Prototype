@@ -3,6 +3,7 @@
 
 using FluentInjections.Application;
 using FluentInjections.Internal;
+using FluentInjections.Internal.BuilderDiscovery;
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;

@@ -6,7 +6,7 @@ using FluentInjections.Application;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
-namespace FluentInjections.Internal;
+namespace FluentInjections.Abstractions;
 
 public interface IBuilderRegistry
 {

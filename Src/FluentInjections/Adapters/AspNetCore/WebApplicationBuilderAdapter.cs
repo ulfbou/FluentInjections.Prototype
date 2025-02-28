@@ -1,37 +1,44 @@
 ﻿// Copyright (c) FluentInjections Project. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
-using FluentInjections.Abstractions;
+using FluentInjections.Abstractions.Adapters;
 using FluentInjections.Configuration;
 using FluentInjections.Logging;
 
 using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Hosting;
 
 using IConfigurationProvider = FluentInjections.Configuration.IConfigurationProvider;
 using ILoggerFactoryProvider = FluentInjections.Logging.ILoggerFactoryProvider;
 
 namespace FluentInjections.Adapters.AspNetCore
 {
-    public class WebApplicationBuilderAdapter : IConcreteBuilderAdapter<WebApplicationBuilder, WebApplication>
+    public class WebApplicationBuilderAdapter : IConcreteBuilderAdapter<IHostApplicationBuilder, WebApplication>
     {
         private readonly WebApplicationBuilder _innerBuilder;
         private readonly IConfigurationProvider _configurationProvider;
         private readonly ILoggerFactoryProvider _loggerFactoryProvider;
 
-        public WebApplicationBuilderAdapter(WebApplicationBuilder builder, IConfigurationProvider configurationProvider = null!, ILoggerFactoryProvider loggerFactoryProvider = null!)
+        public WebApplicationBuilderAdapter(IHostApplicationBuilder builder, IConfigurationProvider configurationProvider = null!, ILoggerFactoryProvider loggerFactoryProvider = null!)
         {
-            _innerBuilder = builder ?? throw new ArgumentNullException(nameof(builder));
+            _innerBuilder = builder as WebApplicationBuilder ?? throw new ArgumentException("Builder must be a WebApplicationBuilder", nameof(builder));
             _configurationProvider = configurationProvider ?? NullConfigurationProvider.Instance;
             _loggerFactoryProvider = loggerFactoryProvider ?? NullLoggerFactoryProvider.Instance;
         }
 
-        public WebApplicationBuilder ConcreteBuilder => _innerBuilder;
+        public IHostApplicationBuilder ConcreteBuilder => _innerBuilder;
+        public WebApplicationBuilder Builder => _innerBuilder;
         public IConfigurationProvider ConfigurationProvider => _configurationProvider;
         public ILoggerFactoryProvider LoggerFactoryProvider => _loggerFactoryProvider;
 
-        public async Task<WebApplication> BuildAsync() // Implementing IBuilderAdapter<WebApplication>.BuildAsync
+        public Task<WebApplication> BuildAsync(CancellationToken cancellationToken)
         {
-            return await Task.FromResult(_innerBuilder.Build()); // Example, might need to be sync in WebAppBuilder
+            if (cancellationToken.IsCancellationRequested)
+            {
+                return Task.FromCanceled<WebApplication>(cancellationToken);
+            }
+
+            return Task.FromResult(_innerBuilder.Build());
         }
     }
 }

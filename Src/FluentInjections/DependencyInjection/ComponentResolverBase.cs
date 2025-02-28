@@ -14,16 +14,16 @@ public class ComponentResolverBase<TComponent> where TComponent : IComponent
 
     public IServiceProvider ServiceProvider => _serviceProvider;
 
-    // Constructor 1: Use provided IServiceProvider (preferred in most cases)
-    public ComponentResolverBase(IServiceProvider provider)
+
+    public ComponentResolverBase(IServiceProvider provider)// Constructor 1: Use provided IServiceProvider (preferred in most cases)
     {
         _serviceProvider = provider ?? throw new ArgumentNullException(nameof(provider));
         _logger = provider.GetService<ILoggerFactory>()?.CreateLogger(GetType())
             ?? throw new InvalidOperationException("Unable to create logger.");
     }
 
-    // Constructor 2: Iterate to find IServiceProvider (for specific scenarios)
-    public ComponentResolverBase(IComponentResolver<TComponent> resolver)
+
+    public ComponentResolverBase(IComponentResolver<TComponent> resolver)// Constructor 2: Iterate to find IServiceProvider (for specific scenarios)
     {
         _innerResolver = resolver ?? throw new ArgumentNullException(nameof(resolver));
         _serviceProvider = GetServiceProvider(resolver);

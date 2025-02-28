@@ -4,7 +4,8 @@
 namespace FluentInjections.Abstractions
 {
     public interface IBuilderAdapter<TApplication>
+            where TApplication : notnull
     {
-        Task<TApplication> BuildAsync();
+        Task<TApplication> BuildAsync(CancellationToken cancellationToken);
     }
 }

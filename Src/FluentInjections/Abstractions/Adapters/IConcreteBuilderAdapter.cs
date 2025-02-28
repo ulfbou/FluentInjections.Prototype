@@ -5,9 +5,11 @@ using FluentInjections.Logging;
 
 using IConfigurationProvider = FluentInjections.Configuration.IConfigurationProvider;
 
-namespace FluentInjections.Abstractions
+namespace FluentInjections.Abstractions.Adapters
 {
-    public interface IConcreteBuilderAdapter<TConcreteBuilder, TConcreteApplication> : IBuilderAdapter<TConcreteApplication>
+    public interface IConcreteBuilderAdapter<TConcreteBuilder, TConcreteApplication>
+            where TConcreteBuilder : notnull
+            where TConcreteApplication : notnull
     {
         TConcreteBuilder ConcreteBuilder { get; }
         IConfigurationProvider ConfigurationProvider { get; }

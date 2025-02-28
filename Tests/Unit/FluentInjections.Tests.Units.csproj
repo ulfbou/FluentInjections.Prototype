@@ -34,6 +34,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\Infrastructure\FluentInjections.Tests.Infrastructure.csproj" />
+		<ProjectReference Include="..\Utils\FluentInjections.Tests.Utils.csproj" />
 	</ItemGroup>
 
 

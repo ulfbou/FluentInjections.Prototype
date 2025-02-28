@@ -1,8 +1,9 @@
 ﻿// Copyright (c) FluentInjections Project. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
+using FluentInjections.Abstractions;
+using FluentInjections.Abstractions.Factories;
 using FluentInjections.Application;
-using FluentInjections.Internal;
 using FluentInjections.Validation;
 
 using Microsoft.Extensions.DependencyInjection;
@@ -10,7 +11,7 @@ using Microsoft.Extensions.Logging;
 
 using System.Reflection;
 
-namespace FluentInjections.Internal
+namespace FluentInjections.Internal.BuilderDiscovery
 {
     internal sealed class BuilderDiscoverer<TBuilder>
         where TBuilder : IApplicationBuilder<TBuilder>

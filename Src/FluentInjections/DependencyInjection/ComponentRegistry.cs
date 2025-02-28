@@ -4,24 +4,13 @@
 using FluentInjections.Validation;
 
 using Microsoft.Extensions.Logging;
-
-using Nito.AsyncEx;
-
-using System.Collections.Concurrent;
-using System.Diagnostics;
 using System.Runtime.CompilerServices;
-
-namespace FluentInjections.DependencyInjection;
 
 using FluentInjections.Components;
 
 /// <inheritdoc/>
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Threading;
-using System.Threading.Tasks;
+
+namespace FluentInjections.DependencyInjection;
 
 internal sealed class ComponentRegistry<TComponent> : IComponentRegistry<TComponent>
     where TComponent : IComponent

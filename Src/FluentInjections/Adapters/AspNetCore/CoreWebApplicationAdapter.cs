@@ -2,6 +2,7 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
 using FluentInjections.Abstractions;
+using FluentInjections.Abstractions.Adapters;
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Hosting;
@@ -11,22 +12,23 @@ using ILoggerFactoryProvider = FluentInjections.Logging.ILoggerFactoryProvider;
 namespace FluentInjections.Adapters.AspNetCore
 {
     public class CoreWebApplicationAdapter :
-        IConcreteApplicationAdapter<WebApplication>,
+        IConcreteApplicationAdapter<IApplicationBuilder>,
         IAppCore,
         IMiddlewareCapableApplicationAdapter // Implement IMiddlewareCapableApplicationAdapter now
     {
         private readonly WebApplication _innerApplication;
         private readonly CoreWebApplicationBuilderAdapter _builderAdapter;
 
-        public CoreWebApplicationAdapter(WebApplication application, CoreWebApplicationBuilderAdapter builderAdapter)
+        public CoreWebApplicationAdapter(IApplicationBuilder application, CoreWebApplicationBuilderAdapter builderAdapter)
         {
-            _innerApplication = application ?? throw new ArgumentNullException(nameof(application));
+            _innerApplication = application as WebApplication ?? throw new ArgumentException("Builder must be a WebApplication", nameof(application));
             _builderAdapter = builderAdapter ?? throw new ArgumentNullException(nameof(builderAdapter));
         }
         // I had to add some properties
-        public WebApplication ConcreteApplication => _innerApplication;
-        public IBuilderAdapter<WebApplication> Adapter => _builderAdapter;
+        public IApplicationBuilder ConcreteApplication => _innerApplication;
         public ILoggerFactoryProvider? LoggerFactoryProvider => _builderAdapter.LoggerFactoryProvider;
+
+        public IBuilderAdapter<WebApplication> Adapter => (IBuilderAdapter<WebApplication>)_builderAdapter;
 
         public Task RunAsync(CancellationToken? cancellationToken = null)
         {
@@ -52,11 +54,10 @@ namespace FluentInjections.Adapters.AspNetCore
             }
         }
 
-        // **Implementation of RegisterMiddleware from IMiddlewareCapableApplicationAdapter**
         public void RegisterMiddleware(Func<ApplicationDelegate, ApplicationDelegate> middleware)
         {
-            var middlewareAdapter = new AspNetCoreMiddlewareAdapter(middleware); // Still use AspNetCoreMiddlewareAdapter for ASP.NET Core
-            _innerApplication.Use(middlewareAdapter.ToAspNetCoreMiddleware()); // Register in ASP.NET Core pipeline
+            var middlewareAdapter = new AspNetCoreMiddlewareAdapter(middleware);
+            _innerApplication.Use(middlewareAdapter.ToAspNetCoreMiddleware());
         }
 
         // **Remove or Deprecate UseMiddleware method (as it's now in the interface and implemented as RegisterMiddleware)**

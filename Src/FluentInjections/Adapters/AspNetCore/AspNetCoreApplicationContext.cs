@@ -18,7 +18,7 @@ namespace FluentInjections.Adapters.AspNetCore
             _httpContext = httpContext ?? throw new ArgumentNullException(nameof(httpContext));
         }
 
-        public HttpContext HttpContext => _httpContext; // Expose the underlying HttpContext if needed
+        public HttpContext HttpContext => _httpContext;
 
         public CancellationToken CancellationToken => _httpContext.RequestAborted;
     }

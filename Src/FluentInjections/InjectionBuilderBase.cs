@@ -11,18 +11,18 @@
 
 //namespace FluentInjections
 //{
-//    public class InjectionBuilderBase<T>
-//    {
-//        private IServiceProvider internalServiceProvider;
-//        private WebApplicationBuilder builder;
-//        private IServiceProviderFactory serviceProviderFactory;
+//public class InjectionBuilderBase<T>
+//{
+//    private IServiceProvider internalServiceProvider;
+//    private WebApplicationBuilder builder;
+//    private IServiceProviderFactory serviceProviderFactory;
 
-//        public InjectionBuilderBase(IServiceProvider internalServiceProvider, WebApplicationBuilder builder, IServiceProviderFactory serviceProviderFactory)
-//        {
-//            this.internalServiceProvider = internalServiceProvider;
-//            this.builder = builder;
-//            this.serviceProviderFactory = serviceProviderFactory;
-//        }
+//    public InjectionBuilderBase(IServiceProvider internalServiceProvider, WebApplicationBuilder builder, IServiceProviderFactory serviceProviderFactory)
+//    {
+//        this.internalServiceProvider = internalServiceProvider;
+//        this.builder = builder;
+//        this.serviceProviderFactory = serviceProviderFactory;
+//    }
 
 //    public override async Task<IApplication<WebApplicationBuilder>> BuildAsync(CancellationToken cancellationToken)
 //    {
@@ -75,5 +75,5 @@
 
 //        return CreateApplication(_builder);
 //    }
-//    }
+//}
 //}

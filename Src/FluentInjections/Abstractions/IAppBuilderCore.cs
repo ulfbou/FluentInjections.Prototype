@@ -3,8 +3,9 @@
 
 namespace FluentInjections.Abstractions
 {
-    public interface IAppBuilderCore<TAppCore> where TAppCore : IAppCore
+    public interface IAppBuilderCore<TAppCore>
+            where TAppCore : notnull, IAppCore
     {
-        Task<TAppCore> BuildAsync();
+        Task<TAppCore> BuildAsync(CancellationToken? cancellationToken = null);
     }
 }
