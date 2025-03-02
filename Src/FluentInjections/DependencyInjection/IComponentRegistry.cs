@@ -68,6 +68,13 @@ namespace FluentInjections.DependencyInjection
         /// <param name="alias">The alias of the component descriptor to unregister.</param>
         /// <param name="cancellationToken">A cancellation token to stop the operation.</param>
         /// <returns>A <see cref="ValueTask{TResult}"/> representing the asynchronous operation, resulting in a boolean indicating if the component descriptor was unregistered.</returns>
-        ValueTask<bool> UnregisterAsync(string? alias = null, CancellationToken cancellationToken = default);
+        ValueTask<bool> UnregisterAsync(string alias, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Gets the <see cref="IComponentResolver{TComponent}"/> for resolving components.
+        /// </summary>
+        /// <param name="cancellationToken">A cancellation token to stop the operation.</param>
+        /// <returns>A <see cref="ValueTask{TResult}"/> representing the asynchronous operation, resulting in a component resolver.</returns>
+        ValueTask<IServiceProvider> GetServiceProviderAsync(CancellationToken cancellationToken = default);
     }
 }

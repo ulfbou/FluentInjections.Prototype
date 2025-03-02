@@ -40,7 +40,7 @@ namespace FluentInjections.Abstractions
         /// <param name="configureRegistry">The action to configure the service component registry.</param>
         /// <returns>The application builder abstraction instance.</returns>
         IApplicationBuilderAbstraction ConfigureServices<TRegistry>(Action<TRegistry> configureRegistry)
-            where TRegistry : IComponentRegistry<IServiceComponent>;
+            where TRegistry : DependencyInjection.IComponentRegistry<IServiceComponent>;
 
         /// <summary>
         /// Configures the middleware components for the application.
@@ -49,6 +49,6 @@ namespace FluentInjections.Abstractions
         /// <param name="configureMiddleware">The action to configure the middleware component registry.</param>
         /// <returns>The application builder abstraction instance.</returns>
         IApplicationBuilderAbstraction ConfigureMiddleware<TRegistry>(Action<TRegistry> configureMiddleware)
-            where TRegistry : IComponentRegistry<IMiddlewareComponent>;
+            where TRegistry : DependencyInjection.IComponentRegistry<IMiddlewareComponent>;
     }
 }
