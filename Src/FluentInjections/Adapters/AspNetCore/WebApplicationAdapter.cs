@@ -1,39 +1,49 @@
 ﻿// Copyright (c) FluentInjections Project. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
-//using FluentInjections.Abstractions;
-//using FluentInjections.Abstractions.Adapters;
-//using FluentInjections.Logging;
+using FluentInjections.Abstractions.Adapters;
 
-//using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
-//using ILoggerFactoryProvider = FluentInjections.Logging.ILoggerFactoryProvider;
+namespace FluentInjections.Adapters.AspNetCore
+{
+    public class WebApplicationAdapter : IApplicationAdapter<WebApplication>
+    {
+        public WebApplication Application { get; }
+        private readonly ILogger<WebApplicationAdapter> _logger;
 
-//namespace FluentInjections.Adapters.AspNetCore
-//{
-//    public class WebApplicationAdapter : IConcreteApplicationAdapter<WebApplication>
-//    {
-//        private readonly WebApplication _innerApplication;
-//        private readonly WebApplicationBuilderAdapter _builderAdapter; // Store the builder adapter for relationship (optional, depending on needs)
-//        private readonly ILoggerFactoryProvider _loggerProvider;
+        public WebApplicationAdapter(WebApplication application, ILogger<WebApplicationAdapter> logger)
+        {
+            Application = application;
+            _logger = logger;
+        }
 
-//        public WebApplicationAdapter(WebApplication application, WebApplicationBuilderAdapter builderAdapter, ILoggerFactoryProvider loggerProvider)
-//        {
-//            _innerApplication = application ?? throw new ArgumentNullException(nameof(application));
-//            _builderAdapter = builderAdapter ?? throw new ArgumentNullException(nameof(builderAdapter)); // Optional
-//            _loggerProvider = loggerProvider ?? NullLoggerFactoryProvider.Instance;
-//        }
+        public Task StartAsync(CancellationToken cancellationToken = default)
+        {
+            _logger.LogInformation("Starting WebApplication...");
+            return Application.StartAsync(cancellationToken);
+        }
 
-//        public WebApplication ConcreteApplication => _innerApplication;
-//        public IBuilderAdapter<WebApplication> Adapter => _builderAdapter;
-//        public ILoggerFactoryProvider LoggerFactoryProvider => _loggerProvider;
+        public Task StopAsync(CancellationToken cancellationToken = default)
+        {
+            _logger.LogInformation("Stopping WebApplication...");
+            return Application.StopAsync(cancellationToken);
+        }
 
-//        public async Task RunAsync()
-//        {
-//            await _innerApplication.RunAsync();
-//        }
+        public Task RunAsync(CancellationToken cancellationToken = default)
+        {
+            _logger.LogInformation("Running WebApplication...");
+            return Application.RunAsync(cancellationToken);
+        }
 
-//        public Task RunAsync(CancellationToken? cancellationToken = null) => throw new NotImplementedException();
-//        public Task StopAsync(CancellationToken? cancellationToken = null) => throw new NotImplementedException();
-//    }
-//}
+        public async ValueTask DisposeAsync()
+        {
+            _logger.LogInformation("Disposing WebApplicationAdapter...");
+            await StopAsync();
+            Application.Dispose();
+        }
+    }
+}

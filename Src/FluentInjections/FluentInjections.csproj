@@ -38,22 +38,27 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.Extensions.Configuration" Version="9.*" />
-		<PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="9.0.2" />
-		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.2" />
-		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.*" />
-		<PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.2" />
-		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.*" />
+		<PackageReference Include="Microsoft.Extensions.Configuration" Version="10.0.0-preview.1.25080.5" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.0-preview.1.25080.5" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.0-preview.1.25080.5" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.0-preview.1.25080.5" />
+		<PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.0-preview.1.25080.5" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.0-preview.1.25080.5" />
 		<PackageReference Include="Moq" Version="4.*" />
 		<PackageReference Include="Nito.AsyncEx" Version="5.1.2" />
-		<PackageReference Include="OpenTelemetry.Api" Version="1.11.1" />
-		<PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.11.1" />
+		<PackageReference Include="OpenTelemetry.Api" Version="1.11.2" />
+		<PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.11.2" />
 		<PackageReference Include="System.Collections.Concurrent" Version="4.*" />
-		<PackageReference Include="System.Diagnostics.DiagnosticSource" Version="9.0.2" />
+		<PackageReference Include="System.Diagnostics.DiagnosticSource" Version="10.0.0-preview.1.25080.5" />
 	</ItemGroup>
 
 	<ItemGroup>
+		<Folder Include="Abstractions\Factories\AspNetCore\" />
+		<Folder Include="Configurators\" />
 		<Folder Include="Injection\" />
+		<Folder Include="Internal\Building\" />
+		<Folder Include="Internal\Metadata\" />
+		<Folder Include="Internal\Modules\" />
 	</ItemGroup>
 
 </Project>

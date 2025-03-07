@@ -41,12 +41,17 @@ namespace FluentInjections.Abstractions
         /// <summary>
         /// Gets the factory function to create the component.
         /// </summary>
-        Func<DependencyInjection.IComponentResolver<TComponent>, ValueTask<TContract>>? Factory { get; init; }
+        Func<IComponentResolver<TComponent>, CancellationToken, ValueTask<TContract>>? Factory { get; init; }
 
         /// <summary>
         /// Gets the configuration action to perform on the component.
         /// </summary>
-        Action<TContract>? Configure { get; init; }
+        Func<TContract, CancellationToken, ValueTask>? Configure { get; init; }
+
+        /// <summary>
+        /// Gets the configuration action to perform on the component.
+        /// </summary>
+        Func<IComponentResolver<TComponent>, CancellationToken, ValueTask<bool>>? Condition { get; init; }
 
         /// <summary>
         /// Gets the metadata of the component.
@@ -56,11 +61,6 @@ namespace FluentInjections.Abstractions
         /// <summary>
         /// Gets the parameters of the component.
         /// </summary>
-        object Parameters { get; }
-
-        /// <summary>
-        /// Gets the condition to determine if the component is valid.
-        /// </summary>
-        Func<IServiceProvider, ValueTask<bool>>? Condition { get; init; }
+        object? Parameters { get; }
     }
 }

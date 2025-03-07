@@ -1,10 +1,10 @@
 ﻿// Copyright (c) FluentInjections Project. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
-using FluentInjections.Abstractions;
-
-using Microsoft.Extensions.DependencyInjection;
-
-namespace FluentInjections.DependencyInjection
+namespace FluentInjections.Abstractions
 {
+    public interface IConfigurator
+    {
+        Task RegisterAsync(CancellationToken cancellationToken);
+    }
 }

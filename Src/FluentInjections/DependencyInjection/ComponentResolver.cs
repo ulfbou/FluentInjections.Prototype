@@ -61,7 +61,7 @@ namespace FluentInjections.DependencyInjection
                         }
                         else if (descriptor.Factory != null)
                         {
-                            yield return await descriptor.Factory(this).ConfigureAwait(false);
+                            yield return await descriptor.Factory(this, cancellationToken).ConfigureAwait(false);
                         }
                         else
                         {
@@ -86,7 +86,7 @@ namespace FluentInjections.DependencyInjection
                     }
                     else if (descriptor.Factory != null)
                     {
-                        yield return await descriptor.Factory(this).ConfigureAwait(false);
+                        yield return await descriptor.Factory(this, cancellationToken).ConfigureAwait(false);
                     }
                     else
                     {
@@ -96,10 +96,11 @@ namespace FluentInjections.DependencyInjection
             }
         }
 
+        public IAsyncEnumerable<TContract> ResolveManyAsync<TContract>(Func<IComponentDescriptor<TComponent, TContract>, CancellationToken, ValueTask<bool>>? predicate = null, CancellationToken cancellationToken = default) => throw new NotImplementedException();
         public IAsyncEnumerable<TContract> ResolveManyAsyncSimple<TContract>(Func<IComponentDescriptor<TComponent, TContract>, ValueTask<bool>>? predicate = null, CancellationToken cancellationToken = default) => throw new NotImplementedException();
 
         public async ValueTask<TContract?> ResolveSingleAsync<TContract>(
-            Func<IComponentDescriptor<TComponent, TContract>, ValueTask<bool>>? predicate = null,
+            Func<IComponentDescriptor<TComponent, TContract>, CancellationToken, ValueTask<bool>> predicate,
             CancellationToken cancellationToken = default)
         {
             using (await _asyncLock.LockAsync(cancellationToken).ConfigureAwait(false))
@@ -112,7 +113,7 @@ namespace FluentInjections.DependencyInjection
                     }
                     else if (descriptor.Factory != null)
                     {
-                        return await descriptor.Factory(this).ConfigureAwait(false);
+                        return await descriptor.Factory(this, cancellationToken).ConfigureAwait(false);
                     }
                     else
                     {
@@ -138,7 +139,7 @@ namespace FluentInjections.DependencyInjection
                     }
                     else if (descriptor.Factory != null)
                     {
-                        return await descriptor.Factory(this).ConfigureAwait(false);
+                        return await descriptor.Factory(this, cancellationToken).ConfigureAwait(false);
                     }
                     else
                     {
@@ -149,6 +150,10 @@ namespace FluentInjections.DependencyInjection
                 return default;
             }
         }
+
+
+        public ValueTask<object?> ResolveSingleAsync(Type serviceType, string? alias = null, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+        public ValueTask<object?> ResolveSingleAsync(Type serviceType, Func<IComponentDescriptor<TComponent, object>, CancellationToken, ValueTask<bool>> predicate, CancellationToken cancellationToken = default) => throw new NotImplementedException();
 
         private TContract GetInstanceFromServiceProvider<TContract>(IComponentDescriptor<TComponent, TContract> descriptor)
         {

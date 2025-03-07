@@ -1,44 +1,34 @@
 ﻿// Copyright (c) FluentInjections Project. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
-//using FluentInjections.Abstractions.Adapters;
-//using FluentInjections.Configuration;
-//using FluentInjections.Logging;
+using FluentInjections.Abstractions.Adapters;
 
-//using Microsoft.AspNetCore.Builder;
-//using Microsoft.Extensions.Hosting;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
-//using IConfigurationProvider = FluentInjections.Configuration.IConfigurationProvider;
-//using ILoggerFactoryProvider = FluentInjections.Logging.ILoggerFactoryProvider;
+namespace FluentInjections.Adapters.AspNetCore
+{
+    public class WebApplicationBuilderAdapter : IApplicationBuilderAdapter<WebApplication>
+    {
+        private readonly WebApplicationBuilder _builder;
 
-//namespace FluentInjections.Adapters.AspNetCore
-//{
-//    public class WebApplicationBuilderAdapter : IConcreteBuilderAdapter<IHostApplicationBuilder, WebApplication>
-//    {
-//        private readonly WebApplicationBuilder _innerBuilder;
-//        private readonly IConfigurationProvider _configurationProvider;
-//        private readonly ILoggerFactoryProvider _loggerFactoryProvider;
+        public WebApplicationBuilderAdapter(WebApplicationBuilder builder)
+        {
+            _builder = builder;
+        }
 
-//        public WebApplicationBuilderAdapter(IHostApplicationBuilder builder, IConfigurationProvider configurationProvider = null!, ILoggerFactoryProvider loggerFactoryProvider = null!)
-//        {
-//            _innerBuilder = builder as WebApplicationBuilder ?? throw new ArgumentException("Builder must be a WebApplicationBuilder", nameof(builder));
-//            _configurationProvider = configurationProvider ?? NullConfigurationProvider.Instance;
-//            _loggerFactoryProvider = loggerFactoryProvider ?? NullLoggerFactoryProvider.Instance;
-//        }
+        public async Task<IApplicationAdapter<WebApplication>> BuildAsync(CancellationToken cancellationToken = default)
+        {
+            var application = _builder.Build();
+            var loggerFactory = application.Services.GetRequiredService<ILoggerFactory>();
+            var logger = loggerFactory.CreateLogger<WebApplicationAdapter>();
+            return new WebApplicationAdapter(application, logger);
+        }
 
-//        public IHostApplicationBuilder ConcreteBuilder => _innerBuilder;
-//        public WebApplicationBuilder Builder => _innerBuilder;
-//        public IConfigurationProvider ConfigurationProvider => _configurationProvider;
-//        public ILoggerFactoryProvider LoggerFactoryProvider => _loggerFactoryProvider;
-
-//        public Task<WebApplication> BuildAsync(CancellationToken cancellationToken)
-//        {
-//            if (cancellationToken.IsCancellationRequested)
-//            {
-//                return Task.FromCanceled<WebApplication>(cancellationToken);
-//            }
-
-//            return Task.FromResult(_innerBuilder.Build());
-//        }
-//    }
-//}
+        public ValueTask DisposeAsync()
+        {
+            return ValueTask.CompletedTask;
+        }
+    }
+}

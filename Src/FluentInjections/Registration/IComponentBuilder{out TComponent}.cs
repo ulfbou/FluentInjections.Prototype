@@ -3,8 +3,9 @@
 
 using FluentInjections.Abstractions;
 
-using Microsoft.Extensions.DependencyInjection;
-
-namespace FluentInjections.DependencyInjection
+namespace FluentInjections.Registration
 {
+    public interface IComponentBuilder<out TComponent>
+        where TComponent : IComponent
+    { }
 }

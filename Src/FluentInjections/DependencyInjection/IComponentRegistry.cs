@@ -54,13 +54,11 @@ namespace FluentInjections.DependencyInjection
         /// <summary>
         /// Asynchronously registers a component descriptor.
         /// </summary>
-        /// <typeparam name="TRegistration">The type of the component descriptor.</typeparam>
         /// <typeparam name="TContract">The type of the contract.</typeparam>
         /// <param name="descriptor">The component descriptor to register.</param>
         /// <param name="cancellationToken">A cancellation token to stop the operation.</param>
         /// <returns>A <see cref="ValueTask"/> representing the asynchronous operation.</returns>
-        ValueTask RegisterAsync<TRegistration, TContract>(TRegistration descriptor, CancellationToken cancellationToken = default)
-            where TRegistration : IComponentRegistration<TComponent, TContract>;
+        ValueTask RegisterAsync<TContract>(IComponentRegistration<TComponent, TContract> registration, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Asynchronously unregisters a component descriptor based on an alias.
@@ -73,8 +71,9 @@ namespace FluentInjections.DependencyInjection
         /// <summary>
         /// Gets the <see cref="IComponentResolver{TComponent}"/> for resolving components.
         /// </summary>
+        /// <param name="resolver">The component resolver to use.</param>
         /// <param name="cancellationToken">A cancellation token to stop the operation.</param>
         /// <returns>A <see cref="ValueTask{TResult}"/> representing the asynchronous operation, resulting in a component resolver.</returns>
-        ValueTask<IServiceProvider> GetServiceProviderAsync(CancellationToken cancellationToken = default);
+        ValueTask<IServiceProvider> GetServiceProviderAsync(IComponentResolver<TComponent> resolver, CancellationToken cancellationToken = default);
     }
 }

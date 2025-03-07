@@ -24,7 +24,7 @@ namespace FluentInjections.DependencyInjection
         /// <param name="cancellationToken">A cancellation token to stop the operation.</param>
         /// <returns>An <see cref="IAsyncEnumerable{T}"/> of component instances.</returns>
         IAsyncEnumerable<TContract> ResolveManyAsync<TContract>(
-                Func<IComponentDescriptor<TComponent, TContract>, ValueTask<bool>>? predicate = null,
+                Func<IComponentDescriptor<TComponent, TContract>, CancellationToken, ValueTask<bool>>? predicate = null,
                 CancellationToken cancellationToken = default);
 
         /// <summary>
@@ -39,17 +39,6 @@ namespace FluentInjections.DependencyInjection
             CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Asynchronously resolves multiple component instances based on a predicate, without descriptor information.
-        /// </summary>
-        /// <typeparam name="TContract">The type of the contract.</typeparam>
-        /// <param name="predicate">An optional predicate to filter the components.</param>
-        /// <param name="cancellationToken">A cancellation token to stop the operation.</param>
-        /// <returns>An <see cref="IAsyncEnumerable{T}"/> of component instances.</returns>
-        IAsyncEnumerable<TContract> ResolveManyAsyncSimple<TContract>(
-            Func<IComponentDescriptor<TComponent, TContract>, ValueTask<bool>>? predicate = null,
-            CancellationToken cancellationToken = default);
-
-        /// <summary>
         /// Asynchronously resolves a single component instance based on a predicate.
         /// </summary>
         /// <typeparam name="TContract">The type of the contract.</typeparam>
@@ -57,7 +46,7 @@ namespace FluentInjections.DependencyInjection
         /// <param name="cancellationToken">A cancellation token to stop the operation.</param>
         /// <returns>A <see cref="ValueTask{TResult?}"/> representing the asynchronous operation, resulting in a component instance or null.</returns>
         ValueTask<TContract?> ResolveSingleAsync<TContract>(
-            Func<IComponentDescriptor<TComponent, TContract>, ValueTask<bool>>? predicate = null,
+            Func<IComponentDescriptor<TComponent, TContract>, CancellationToken, ValueTask<bool>> predicate,
             CancellationToken cancellationToken = default);
 
         /// <summary>
@@ -69,6 +58,30 @@ namespace FluentInjections.DependencyInjection
         /// <returns>A <see cref="ValueTask{TResult?}"/> representing the asynchronous operation, resulting in a component instance or null.</returns>
         ValueTask<TContract?> ResolveSingleAsync<TContract>(
             string? alias = null,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Asynchronously resolves a single component instance based on an alias.
+        /// </summary>
+        /// <param name="contractType">The type of the contract.</param>
+        /// <param name="alias">The alias of the component.</param>
+        /// <param name="cancellationToken">A cancellation token to stop the operation.</param>
+        /// <returns>A <see cref="ValueTask{TResult?}"/> representing the asynchronous operation, resulting in a component instance or null.</returns>
+        ValueTask<object?> ResolveSingleAsync(
+            Type serviceType,
+            string? alias = null,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Asynchronously resolves a single component instance based on a predicate.
+        /// </summary>
+        /// <param name="contractType">The type of the contract.</param>
+        /// <param name="predicate">A predicate to filter the component.</param>
+        /// <param name="cancellationToken">A cancellation token to stop the operation.</param>
+        /// <returns>A <see cref="ValueTask{TResult?}"/> representing the asynchronous operation, resulting in a component instance or null.</returns>
+        ValueTask<object?> ResolveSingleAsync(
+            Type serviceType,
+            Func<IComponentDescriptor<TComponent, object>, CancellationToken, ValueTask<bool>> predicate,
             CancellationToken cancellationToken = default);
     }
 }

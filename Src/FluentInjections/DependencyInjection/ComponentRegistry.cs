@@ -5,6 +5,7 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
 using FluentInjections.Abstractions;
+using FluentInjections.Extensions.Internal;
 using FluentInjections.Validation;
 
 using Microsoft.Extensions.DependencyInjection;
@@ -37,20 +38,29 @@ namespace FluentInjections.DependencyInjection
             _logger = logger;
         }
 
-        public async ValueTask<IServiceProvider> GetServiceProviderAsync(CancellationToken cancellationToken = default)
+        public async ValueTask<IServiceProvider> GetServiceProviderAsync(IComponentResolver<TComponent> resolver, CancellationToken cancellationToken = default)
         {
+            Guard.NotNull(resolver, nameof(resolver));
+
+            if (cancellationToken == default)
+            {
+                cancellationToken = CancellationToken.None;
+            }
+
+            cancellationToken.ThrowIfCancellationRequested();
+
             if (_serviceProvider == null)
             {
                 using (await _asyncLock.LockAsync(cancellationToken).ConfigureAwait(false))
                 {
-                    BuildServiceProviderInternal();
+                    await BuildServiceProviderInternalAsync(resolver, cancellationToken);
                 }
             }
 
             return _serviceProvider!;
         }
 
-        private void BuildServiceProviderInternal()
+        private async Task BuildServiceProviderInternalAsync(IComponentResolver<TComponent> resolver, CancellationToken cancellationToken)
         {
             if (!_registrations.Any())
             {
@@ -63,7 +73,6 @@ namespace FluentInjections.DependencyInjection
                     _logger.LogError(ex, "Failed to build service provider when no registrations exist.");
                     throw;
                 }
-                return;
             }
 
             try
@@ -74,7 +83,7 @@ namespace FluentInjections.DependencyInjection
                     {
                         if (registrationObj is IComponentRegistration<TComponent, object> registration)
                         {
-                            _services.Add(CreateServiceDescriptor(registration));
+                            _services.Add(await CreateServiceDescriptorAsync(registration, resolver, cancellationToken));
                         }
                     }
                 }
@@ -88,21 +97,26 @@ namespace FluentInjections.DependencyInjection
             }
         }
 
-        private ServiceDescriptor CreateServiceDescriptor<TContract>(IComponentRegistration<TComponent, TContract> registration)
+        private ValueTask<ServiceDescriptor> CreateServiceDescriptorAsync(
+            IComponentRegistration<TComponent, object> registration,
+            IComponentResolver<TComponent> resolver,
+            CancellationToken cancellationToken)
         {
             if (registration.Instance != null)
             {
-                return new ServiceDescriptor(
+                return ValueTask.FromResult(
+                    new ServiceDescriptor(
                     registration.ContractType,
-                    registration.Instance);
+                    registration.Instance));
             }
 
             if (registration.Factory != null)
             {
-                return new ServiceDescriptor(
+                return ValueTask.FromResult(
+                    new ServiceDescriptor(
                     registration.ContractType,
-                    (provider) => registration.Factory(provider).AsTask().Result!,
-                    registration.Lifetime.ToServiceLifetime());
+                    _ => registration.Factory(resolver, cancellationToken).AsTask().Result,
+                    registration.Lifetime.ToServiceLifetime()));
             }
 
             if (registration.ResolutionType == null)
@@ -110,20 +124,20 @@ namespace FluentInjections.DependencyInjection
                 throw new InvalidOperationException($"ResolutionType is required for registration with alias '{registration.Alias}'.");
             }
 
-            return new ServiceDescriptor(
+            return ValueTask.FromResult(new ServiceDescriptor(
                 registration.ContractType,
                 sp => sp.GetService(registration.ResolutionType)!,
-                registration.Lifetime.ToServiceLifetime());
+                registration.Lifetime.ToServiceLifetime()));
         }
 
-        public async ValueTask RegisterAsync<TRegistration, TContract>(TRegistration registration, CancellationToken cancellationToken = default)
-            where TRegistration : IComponentRegistration<TComponent, TContract>
+
+        public async ValueTask RegisterAsync<TContract>(IComponentRegistration<TComponent, TContract> registration, CancellationToken cancellationToken = default)
         {
             Guard.NotNull(registration, nameof(registration));
 
             if (string.IsNullOrWhiteSpace(registration.Alias))
             {
-                registration.Alias = typeof(TContract).FullName ?? typeof(TContract).Name;
+                throw new ArgumentException("The alias of the registration cannot be null or empty.", nameof(registration));
             }
 
             using (await _asyncLock.LockAsync(cancellationToken).ConfigureAwait(false))
@@ -219,11 +233,14 @@ namespace FluentInjections.DependencyInjection
         {
             alias = GetAlias<TContract>(alias);
 
-            if (_registrations.TryGetValue(typeof(TContract), out var contractRegistrations))
+            using (await _asyncLock.LockAsync())
             {
-                if (await TryGetDescriptorAsync<TDescriptor, TContract>(contractRegistrations, alias, out var descriptor).ConfigureAwait(false))
+                if (_registrations.TryGetValue(typeof(TContract), out var contractRegistrations))
                 {
-                    return descriptor;
+                    if (await TryGetDescriptorAsync<TDescriptor, TContract>(contractRegistrations, alias, out var descriptor).ConfigureAwait(false))
+                    {
+                        return descriptor;
+                    }
                 }
             }
 

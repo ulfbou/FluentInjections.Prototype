@@ -3,8 +3,9 @@
 
 using FluentInjections.Abstractions;
 
-using Microsoft.Extensions.DependencyInjection;
-
-namespace FluentInjections.DependencyInjection
+namespace FluentInjections.Modules
 {
+    public interface IModule<TConfigurator> : IModule
+        where TConfigurator : IConfigurator
+    { }
 }
