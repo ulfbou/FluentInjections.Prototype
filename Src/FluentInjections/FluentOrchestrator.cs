@@ -1,6 +1,7 @@
 ﻿// Copyright (c) FluentInjections Project. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
+using FluentInjections.Abstractions;
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,14 +21,13 @@ namespace FluentInjections
         /// <param name="args">The arguments to pass to the application.</param>
         /// <param name="configuration">The configuration to use for the application.</param>
         /// <param name="services">The services to use for the application.</param>
-        public static FluentOrchestrator<TApplication> For<TApplication>(
-            string[]? args = null,
+        public static IFluentOrchestrator<TApplication> For<TApplication>(
             IConfiguration? configuration = null,
             IServiceCollection? services = null,
             ILoggerFactory? loggerFactory = null)
             where TApplication : class
         {
-            return new FluentOrchestrator<TApplication>(args, configuration, services, loggerFactory);
+            return new FluentOrchestrator<TApplication>(configuration, services, loggerFactory);
         }
     }
 }

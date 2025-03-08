@@ -39,11 +39,23 @@ namespace FluentInjections.Adapters.AspNetCore
             return Application.RunAsync(cancellationToken);
         }
 
+        private async Task Dispose<T>(T obj)
+        {
+            if (obj is IAsyncDisposable asyncDisposable)
+            {
+                await asyncDisposable.DisposeAsync();
+            }
+            else if (obj is IDisposable disposable)
+            {
+                disposable.Dispose();
+            }
+        }
+
         public async ValueTask DisposeAsync()
         {
             _logger.LogInformation("Disposing WebApplicationAdapter...");
             await StopAsync();
-            Application.Dispose();
+            await Dispose(Application);
         }
     }
 }

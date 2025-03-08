@@ -8,7 +8,7 @@ namespace FluentInjections.Orchestration
 {
     public interface IModuleOrchestrator
     {
-        Task ExecuteModulesAsync<TComponent>(IEnumerable<ModuleMetadata> moduleMetadata, CancellationToken? cancellationToken = null)
+        Task ExecuteModulesAsync<TComponent>(IAsyncEnumerable<ModuleMetadata> moduleMetadata, CancellationToken? cancellationToken = null)
             where TComponent : IComponent;
     }
 }

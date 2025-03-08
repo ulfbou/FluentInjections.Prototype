@@ -20,7 +20,6 @@ namespace FluentInjections
     /// </summary>
     /// <typeparam name="TApplication">The type of the application.</typeparam>
     public class FluentOrchestrator<TApplication> : IFluentOrchestrator<TApplication>
-        where TApplication : class
     {
         private Type? _adapterType;
         private Func<IServiceProvider, object>? _adapterFactory;
@@ -104,46 +103,46 @@ namespace FluentInjections
             return adapter;
         }
 
-        /// <summary>
-        /// Builds the application.
-        /// </summary>
-        /// <param name="cancellationToken">The cancellation token.</param>
-        /// <returns>A <see cref="Task{IApplicationAbstraction}"/> instance.</returns>
-        public async Task<IApplicationAbstraction> BuildAsync(CancellationToken cancellationToken)
-        {
-            _services.AddSingleton(_configuration);
-            _services.AddSingleton(_loggerFactory);
-            _services.AddSingleton<IComponentResolverProvider, ComponentResolverProvider>();
+        ///// <summary>
+        ///// Builds the application.
+        ///// </summary>
+        ///// <param name="cancellationToken">The cancellation token.</param>
+        ///// <returns>A <see cref="Task{IApplicationAbstraction}"/> instance.</returns>
+        //public async Task<IApplicationAbstraction> BuildAsync(CancellationToken cancellationToken)
+        //{
+        //    _services.AddSingleton(_configuration);
+        //    _services.AddSingleton(_loggerFactory);
+        //    _services.AddSingleton<IComponentResolverProvider, ComponentResolverProvider>();
 
-            foreach (var adapterType in _adapterRegistry.Values)
-            {
-                _services.AddSingleton(adapterType);
-            }
+        //    foreach (var adapterType in _adapterRegistry.Values)
+        //    {
+        //        _services.AddSingleton(adapterType);
+        //    }
 
-            var serviceProvider = _services.BuildServiceProvider();
-            var resolverProvider = serviceProvider.GetRequiredService<IComponentResolverProvider>();
+        //    var serviceProvider = _services.BuildServiceProvider();
+        //    var resolverProvider = serviceProvider.GetRequiredService<IComponentResolverProvider>();
 
-            var initializer = new FluentOrchestratorInitializer<IComponent, TApplication>(_configuration, _loggerFactory, resolverProvider);
-            await initializer.InitializeAsync(cancellationToken);
+        //    var initializer = new FluentOrchestratorInitializer<IComponent, TApplication>(_configuration, _loggerFactory, resolverProvider);
+        //    await initializer.InitializeAsync(cancellationToken);
 
-            return new ApplicationAbstraction(serviceProvider);
-        }
+        //    return new ApplicationAbstraction(serviceProvider);
+        //}
 
-        private class ApplicationAbstraction : IApplicationAbstraction
-        {
-            private readonly IServiceProvider _serviceProvider;
+        //private class ApplicationAbstraction : IApplicationAbstraction
+        //{
+        //    private readonly IServiceProvider _serviceProvider;
 
-            public ApplicationAbstraction(IServiceProvider serviceProvider)
-            {
-                _serviceProvider = serviceProvider;
-            }
+        //    public ApplicationAbstraction(IServiceProvider serviceProvider)
+        //    {
+        //        _serviceProvider = serviceProvider;
+        //    }
 
-            public ValueTask DisposeAsync() => throw new NotImplementedException();
+        //    public ValueTask DisposeAsync() => throw new NotImplementedException();
 
-            public TService GetService<TService>()
-            {
-                return _serviceProvider.GetService<TService>()!;
-            }
-        }
+        //    public TService GetService<TService>()
+        //    {
+        //        return _serviceProvider.GetService<TService>()!;
+        //    }
+        //}
     }
 }

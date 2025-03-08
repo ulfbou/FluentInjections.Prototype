@@ -16,7 +16,7 @@ using System.Runtime.CompilerServices;
 
 namespace FluentInjections.Internal.Discovery
 {
-    public class ModuleDiscoveryService : IModuleDiscoveryService
+    internal class ModuleDiscoveryService : IModuleDiscoveryService
     {
         private readonly ILogger<ModuleDiscoveryService> _logger;
         private readonly ModuleDiscoveryOptions _options;

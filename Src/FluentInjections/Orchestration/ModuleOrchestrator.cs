@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using FluentInjections.Abstractions;
 using FluentInjections.Modules;
 using FluentInjections.Validation;
+using System.Collections.Concurrent;
 
 namespace FluentInjections.Orchestration
 {
@@ -19,7 +20,7 @@ namespace FluentInjections.Orchestration
             _externalServiceProvider = serviceProvider;
         }
 
-        public async Task ExecuteModulesAsync<TComponent>(IEnumerable<ModuleMetadata> moduleMetadata, CancellationToken? cancellationToken = null)
+        public async Task ExecuteModulesAsync<TComponent>(IAsyncEnumerable<ModuleMetadata> moduleMetadata, CancellationToken? cancellationToken = null)
             where TComponent : IComponent
         {
             Guard.NotNull(moduleMetadata, nameof(moduleMetadata));
@@ -28,10 +29,20 @@ namespace FluentInjections.Orchestration
             var ct = cancellationToken ?? CancellationToken.None;
 
             // Filter modules for the specified component type
-            var filteredMetadata = moduleMetadata
-                .Where(m => m.ComponentType == typeof(TComponent))
-                .OrderBy(m => m.Priority)
-                .ToList();
+            var filteredMetadata = new List<ModuleMetadata>();
+            await foreach (var metadata in moduleMetadata)
+            {
+                if (ct.IsCancellationRequested)
+                {
+                    return;
+                }
+                if (metadata.ComponentType == typeof(TComponent))
+                {
+                    filteredMetadata.Add(metadata);
+                }
+            }
+
+            filteredMetadata = filteredMetadata.OrderBy(m => m.Priority).ToList();
 
             var dependencies = filteredMetadata
                 .SelectMany(m => m.Dependencies ?? Enumerable.Empty<Type>())
@@ -57,7 +68,7 @@ namespace FluentInjections.Orchestration
 
             services.AddSingleton(configurators.Single());
 
-            foreach (var metadata in moduleMetadata)
+            foreach (var metadata in filteredMetadata)
             {
                 if (ct.IsCancellationRequested)
                 {
