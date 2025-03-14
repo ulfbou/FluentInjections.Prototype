@@ -2,7 +2,6 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
 using FluentInjections.Abstractions;
-using FluentInjections.Internal.Building;
 using FluentInjections.Registration;
 using FluentInjections.Validation;
 
