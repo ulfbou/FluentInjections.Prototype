@@ -5,10 +5,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Diagnostics.Metrics;
 
 using Moq;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Diagnostics.Metrics;
 
 namespace FluentInjections.Tests.Utils
 {
