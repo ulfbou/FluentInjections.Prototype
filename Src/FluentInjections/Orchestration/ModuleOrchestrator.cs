@@ -28,18 +28,26 @@ namespace FluentInjections.Orchestration
             var services = new ServiceCollection();
             var ct = cancellationToken ?? CancellationToken.None;
 
-            // Filter modules for the specified component type
             var filteredMetadata = new List<ModuleMetadata>();
+
             await foreach (var metadata in moduleMetadata)
             {
                 if (ct.IsCancellationRequested)
                 {
                     return;
                 }
+
                 if (metadata.ComponentType == typeof(TComponent))
                 {
                     filteredMetadata.Add(metadata);
                 }
+            }
+
+            var configurators = filteredMetadata.Select(m => m.ConfiguratorType);
+
+            if (configurators.Count() > 1)
+            {
+                throw new InvalidOperationException("Multiple configurators found for the specified component type.");
             }
 
             filteredMetadata = filteredMetadata.OrderBy(m => m.Priority).ToList();
@@ -48,13 +56,6 @@ namespace FluentInjections.Orchestration
                 .SelectMany(m => m.Dependencies ?? Enumerable.Empty<Type>())
                 .Distinct()
                 .ToList();
-
-            var configurators = filteredMetadata.Select(m => m.ConfiguratorType);
-
-            if (configurators.Count() > 1)
-            {
-                throw new InvalidOperationException("Multiple configurators found for the specified component type.");
-            }
 
             foreach (var dependency in dependencies)
             {
@@ -90,6 +91,11 @@ namespace FluentInjections.Orchestration
 
             foreach (var module in modules)
             {
+                if (ct.IsCancellationRequested)
+                {
+                    return;
+                }
+
                 await module.ConfigureAsync(configurator, ct).ConfigureAwait(false);
             }
         }
