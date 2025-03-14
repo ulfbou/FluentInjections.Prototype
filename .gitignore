@@ -399,3 +399,5 @@ FodyWeavers.xsd
 # JetBrains Rider
 *.sln.iml
 /Samples
+/Tests/Infrastructure/IInjectionContainer.cs
+/Tests/Unit/Internal/InternalTests2.cs
