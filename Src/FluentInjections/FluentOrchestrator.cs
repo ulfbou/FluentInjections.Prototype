@@ -20,14 +20,15 @@ namespace FluentInjections
         /// <typeparam name="TApplication">The type of the application.</typeparam>
         /// <param name="args">The arguments to pass to the application.</param>
         /// <param name="configuration">The configuration to use for the application.</param>
-        /// <param name="services">The services to use for the application.</param>
+        /// <param name="loggerFactory">The logger factory to use for the application.</param>
         public static IFluentOrchestrator<TApplication> For<TApplication>(
-            IConfiguration? configuration = null,
-            IServiceCollection? services = null,
-            ILoggerFactory? loggerFactory = null)
+                string[]? args = null,
+                IConfiguration? configuration = null,
+                IServiceCollection? services = null,
+                ILoggerFactory? loggerFactory = null)
             where TApplication : class
         {
-            return new FluentOrchestrator<TApplication>(configuration, services, loggerFactory);
+            return new FluentOrchestrator<TApplication>(args ?? Array.Empty<string>(), configuration, loggerFactory);
         }
     }
 }

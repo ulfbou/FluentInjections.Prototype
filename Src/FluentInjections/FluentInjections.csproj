@@ -3,13 +3,13 @@
 	<PropertyGroup>
 		<OutputType>Library</OutputType>
 		<TargetFramework>net9.0</TargetFramework>
-		<LangVersion>13.0</LangVersion>
+		<LangVersion>latest</LangVersion>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<PackageId>FluentInjections</PackageId>
 		<AssemblyTitle>FluentInjections</AssemblyTitle>
 		<AssemblyProduct>FluentInjections</AssemblyProduct>
-		<Version>0.1-beta</Version>
+		<Version>0.2-beta</Version>
 		<Authors>Ulf Bourelius</Authors>
 		<Description>
 			FluentInjections is a streamlined dependency injection library for .NET that simplifies and enhances the
@@ -22,8 +22,25 @@
 		<PackageProjectUrl>https://github.com/ulfbou/FluentInjections/wiki</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/ulfbou/FluentInjections</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
-		<LangVersion>latest</LangVersion>
-		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+		<GenerateAssemblyInfo>True</GenerateAssemblyInfo>
+		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+		<PlatformTarget>AnyCPU</PlatformTarget>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<DefineConstants>NET;NET9_0</DefineConstants>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+		<DefineConstants>$(DefineConstants);TRACE;DEBUG</DefineConstants>
+		<DebugSymbols>true</DebugSymbols>
+		<DebugType>portable</DebugType>
+		<Optimize>False</Optimize>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+		<DefineConstants>$(DefineConstants);RELEASE</DefineConstants>
+		<Optimize>True</Optimize>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -38,23 +55,24 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.Extensions.Configuration" Version="10.0.0-preview.1.25080.5" />
-		<PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.0-preview.1.25080.5" />
-		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.0-preview.1.25080.5" />
-		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.0-preview.1.25080.5" />
-		<PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.0-preview.1.25080.5" />
-		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.0-preview.1.25080.5" />
+		<PackageReference Include="Microsoft.CodeAnalysis.Common" Version="4.13.0" />
+		<PackageReference Include="Microsoft.Extensions.Configuration" Version="9.*" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="9.*" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.*" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.*" />
+		<PackageReference Include="Microsoft.Extensions.Hosting" Version="9.*" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.*" />
 		<PackageReference Include="Moq" Version="4.*" />
 		<PackageReference Include="Nito.AsyncEx" Version="5.1.2" />
 		<PackageReference Include="OpenTelemetry.Api" Version="1.11.2" />
 		<PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.11.2" />
 		<PackageReference Include="System.Collections.Concurrent" Version="4.*" />
-		<PackageReference Include="System.Diagnostics.DiagnosticSource" Version="10.0.0-preview.1.25080.5" />
+		<PackageReference Include="System.Diagnostics.DiagnosticSource" Version="9.0.2" />
+		<PackageReference Include="System.Diagnostics.EventLog" Version="10.0.0-preview.1.25080.5" IncludePrerelease="true" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<Folder Include="Abstractions\Factories\AspNetCore\" />
-		<Folder Include="Configurators\" />
+		<Folder Include="DependencyResolution\" />
 		<Folder Include="Injection\" />
 		<Folder Include="Internal\Building\" />
 		<Folder Include="Internal\Metadata\" />
