@@ -11,10 +11,12 @@ namespace FluentInjections.Extensions
         public static async Task<IEnumerable<T>> ToEnumerable<T>(this IAsyncEnumerable<T> source, CancellationToken cancellationToken = default)
         {
             var list = new List<T>();
+
             await foreach (var item in source.WithCancellation(cancellationToken).ConfigureAwait(false))
             {
                 list.Add(item);
             }
+
             return list;
         }
 
@@ -34,7 +36,7 @@ namespace FluentInjections.Extensions
                     }
 
                     yield return item;
-                    await Task.Yield();
+                    await Task.CompletedTask;
                 }
             }
         }
@@ -60,7 +62,7 @@ namespace FluentInjections.Extensions
                     }
 
                     yield return item;
-                    await Task.Yield();
+                    await Task.CompletedTask;
                 }
             }
         }
@@ -100,7 +102,4 @@ namespace FluentInjections.Extensions
             return (IReadOnlyCollection<T>)collection.ToImmutableArray();
         }
     }
-}
-namespace FluentInjections.Internal.Building
-{
 }
