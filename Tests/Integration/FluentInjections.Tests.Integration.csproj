@@ -30,4 +30,8 @@
 		<Using Include="Xunit" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <ProjectReference Include="..\..\Src\FluentInjections\FluentInjections.csproj" />
+	</ItemGroup>
+
 </Project>
