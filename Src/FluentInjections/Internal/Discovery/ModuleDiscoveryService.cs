@@ -7,10 +7,13 @@ using FluentInjections.Internal.Discovery.Configuration;
 using FluentInjections.Metadata;
 using FluentInjections.Validation;
 
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
@@ -18,8 +21,11 @@ namespace FluentInjections.Internal.Discovery
 {
     internal class ModuleDiscoveryService : IModuleDiscoveryService
     {
+        public const int DefaultPriority = 100;
+
         private readonly ILogger<ModuleDiscoveryService> _logger;
         private readonly ModuleDiscoveryOptions _options;
+        private readonly IServiceCollection _services = new ServiceCollection();
 
         public ModuleDiscoveryService(ILogger<ModuleDiscoveryService> logger, IOptions<ModuleDiscoveryOptions> options)
         {
@@ -29,9 +35,9 @@ namespace FluentInjections.Internal.Discovery
             _options = options.Value;
         }
 
-        public async IAsyncEnumerable<ModuleMetadata> DiscoverModulesAsync(
-            IEnumerable<Assembly> assemblies = null!,
-            [EnumeratorCancellation] CancellationToken cancellationToken = default)
+        public async IAsyncEnumerator<ModuleMetadata> DiscoverModulesAsync(
+                IEnumerable<Assembly> assemblies,
+                CancellationToken cancellationToken)
         {
             assemblies ??= AppDomain.CurrentDomain.GetAssemblies();
             var allTypes = new ConcurrentBag<Type>();
@@ -82,7 +88,7 @@ namespace FluentInjections.Internal.Discovery
         {
             configuratorType = null!;
             componentType = null!;
-            priority = 0;
+            priority = DefaultPriority;
             dependencies = null!;
 
             var interfaces = type.GetInterfaces();
@@ -106,11 +112,7 @@ namespace FluentInjections.Internal.Discovery
                         }
 
                         var dependencyAttributes = type.GetCustomAttributes<ModuleDependencyAttribute>();
-
-                        if (dependencyAttributes.Any())
-                        {
-                            dependencies = dependencyAttributes.Select(attr => attr.DependencyType).ToList();
-                        }
+                        dependencies = dependencyAttributes.Select(attr => attr.DependencyType).ToList();
 
                         return true;
                     }
