@@ -7,7 +7,8 @@ namespace FluentInjections.Abstractions
 {
     public interface IFluentOrchestrator<TApplication>
     {
-        Task<IApplicationAdapter<TApplication>> BuildAsync(CancellationToken? ct = null);
-        IFluentOrchestrator<TApplication> UseAdapter<TAdapter>() where TAdapter : IApplicationAdapter<TApplication>;
+        Task<TApplication> BuildAsync(CancellationToken cancellationToken = default);
+        IFluentOrchestrator<TApplication> UseAdapterInstance(string frameworkIdentifier, object adapterInstance);
+        IFluentOrchestrator<TApplication> UseAdapter<TAdapter>(string frameworkIdentifier) where TAdapter : IApplicationAdapter<TApplication>;
     }
 }
