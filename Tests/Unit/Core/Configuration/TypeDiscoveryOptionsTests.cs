@@ -3,7 +3,12 @@
 
 using FluentAssertions;
 
+using FluentInjections.Abstractions;
 using FluentInjections.Core.Configuration;
+using FluentInjections.Core.Discovery;
+using FluentInjections.Core.Discovery.Metadata;
+
+using Microsoft.AspNetCore.Builder;
 
 namespace FluentInjections.Tests.Units.Core.Configuration
 {
@@ -16,9 +21,9 @@ namespace FluentInjections.Tests.Units.Core.Configuration
             var options = TypeDiscoveryOptions.DefaultOptions;
 
             // Assert
-            options.AssemblyFilterPredicate.Should().Be("FluentInjections");
-            options.InterfaceTypeName.Should().Be("IFluentOrchestrator");
-            options.AttributeTypeName.Should().Be("FluentInjections");
+            options.AssemblyFilterPredicate.Should().Be(nameof(FluentInjections));
+            options.InterfaceTypeName.Should().Be(nameof(IFluentOrchestrator<WebApplication>));
+            options.AttributeTypeName.Should().Be(nameof(AdapterMetadataAttribute));
         }
 
         [Fact]
@@ -27,15 +32,15 @@ namespace FluentInjections.Tests.Units.Core.Configuration
             // Arrange
             var options = new TypeDiscoveryOptions
             {
-                AssemblyFilterPredicate = "Test",
-                InterfaceTypeName = "ITest",
-                AttributeTypeName = "TestAttribute"
+                AssemblyFilterPredicate = nameof(FluentInjections.Tests.Units),
+                InterfaceTypeName = nameof(ITypeDiscoveryContext),
+                AttributeTypeName = nameof(AdapterMetadataAttribute)
             };
 
             // Assert
-            options.AssemblyFilterPredicate.Should().Be("Test");
-            options.InterfaceTypeName.Should().Be("ITest");
-            options.AttributeTypeName.Should().Be("TestAttribute");
+            options.AssemblyFilterPredicate.Should().Be(nameof(FluentInjections.Tests.Units));
+            options.InterfaceTypeName.Should().Be(nameof(ITypeDiscoveryContext));
+            options.AttributeTypeName.Should().Be(nameof(AdapterMetadataAttribute));
         }
     }
 }
