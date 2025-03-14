@@ -10,6 +10,7 @@ namespace FluentInjections.Attributes
         {
             Priority = priority;
         }
+
         public int Priority { get; }
     }
 }
