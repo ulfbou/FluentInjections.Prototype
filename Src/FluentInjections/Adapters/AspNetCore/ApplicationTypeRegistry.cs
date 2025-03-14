@@ -9,6 +9,8 @@ namespace FluentInjections.Adapters.AspNetCore
 {
     public class ApplicationTypeRegistry : IApplicationTypeRegistry
     {
+        public static string FrameworkName { get; } = "ASP.NET Core";
+
         private readonly ConcurrentDictionary<Type, Func<object>> _factories = new();
         private readonly List<IApplicationTypeMetadata> _metadata = new();
 
@@ -19,7 +21,7 @@ namespace FluentInjections.Adapters.AspNetCore
             where TBuilder : IApplicationBuilderAdapter<TInnerApplication>
         {
             _factories[typeof(TInnerApplication)] = () => factory();
-            _metadata.Add(new ApplicationTypeMetadata(typeof(TInnerApplication), typeof(TBuilder), "ASP.NET Core"));
+            _metadata.Add(new ApplicationTypeMetadata(typeof(TInnerApplication), typeof(TBuilder), FrameworkName));
         }
     }
 }

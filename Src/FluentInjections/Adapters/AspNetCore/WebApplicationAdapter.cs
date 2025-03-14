@@ -15,8 +15,11 @@ namespace FluentInjections.Adapters.AspNetCore
         public WebApplication Application { get; }
         private readonly ILogger<WebApplicationAdapter> _logger;
 
+        public ILogger<WebApplicationAdapter> Logger => _logger;
+
         public WebApplicationAdapter(WebApplication application, ILogger<WebApplicationAdapter> logger)
         {
+
             Application = application;
             _logger = logger;
         }
