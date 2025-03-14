@@ -401,3 +401,4 @@ FodyWeavers.xsd
 /Samples
 /Tests/Infrastructure/IInjectionContainer.cs
 /Tests/Unit/Internal/InternalTests2.cs
+/Tests/Unit/Internal/MockBuilder.cs
