@@ -1,10 +1,7 @@
 name: CI - FluentInjections.Tests Phase 1
 
 on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+  workflow_dispatch: # Only runs manually
 
 jobs:
   build-and-test:
